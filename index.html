@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Gestión Canales Zoom · EIE UNSE</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#003366;--blue-mid:#1a5491;--blue-light:#dce8f5;--blue-xlight:#f0f5fb;
+  --gold:#c8973a;--gold-light:#fdf3e0;
+  --green:#1a7a4a;--green-light:#e6f5ee;
+  --red:#b32d2d;--red-light:#fceaea;
+  --purple:#5b2d8e;--purple-light:#ede4f7;
+  --teal:#0e7490;--teal-light:#e0f2f9;
+  --wa:#25D366;--horde:#c0392b;--moodle:#f98012;
+  --gray:#f4f6f9;--border:#d4dce8;--muted:#5a6a82;--text:#1a2535;--white:#fff;
+  --s1:#003366;--s2:#1a5491;--s3:#1a7a4a;--s4:#c8973a;
+  --r:8px;--shadow:0 2px 12px rgba(0,30,80,.10);
+}
+body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--gray);color:var(--text);font-size:14px;min-height:100vh}
+.app{display:flex;min-height:100vh}
+.sidebar{width:230px;background:var(--blue);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto}
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 24px;height:54px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10}
+.content{padding:22px 24px;flex:1;display:flex;flex-direction:column;gap:20px}
+.sb-logo{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,.12)}
+.sb-badge{background:var(--gold);color:#fff;font-size:10px;font-weight:700;letter-spacing:1px;padding:2px 8px;border-radius:4px;display:inline-block;margin-bottom:5px}
+.sb-title{color:#fff;font-size:13px;font-weight:700;line-height:1.3}
+.sb-sub{color:rgba(255,255,255,.5);font-size:10px;margin-top:2px}
+.nav-sec{padding:10px 16px 3px;font-size:10px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1.2px;text-transform:uppercase;margin-top:6px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 16px;color:rgba(255,255,255,.72);cursor:pointer;font-size:13px;border-left:3px solid transparent;transition:all .15s;user-select:none}
+.nav-item:hover{background:rgba(255,255,255,.09);color:#fff}
+.nav-item.active{background:rgba(255,255,255,.14);color:#fff;border-left-color:var(--gold)}
+.nav-ico{font-style:normal;width:18px;text-align:center;font-size:15px}
+.nav-count{margin-left:auto;background:rgba(255,255,255,.18);color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px}
+.sb-footer{padding:14px 16px;border-top:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);font-size:10px;margin-top:auto}
+.tb-title{font-size:15px;font-weight:700;color:var(--blue);flex:1}
+.tb-sync{font-size:11px;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:opacity .15s;white-space:nowrap;text-decoration:none}
+.btn:hover{opacity:.85}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-gold{background:var(--gold);color:#fff}
+.btn-green{background:var(--green);color:#fff}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-sm{padding:5px 10px;font-size:12px}
+.btn-red{background:var(--red);color:#fff}
+.btn-purple{background:var(--purple);color:#fff}
+.btn-teal{background:var(--teal);color:#fff}
+.btn-wa{background:var(--wa);color:#fff}
+.btn-horde{background:var(--horde);color:#fff}
+.btn-moodle{background:var(--moodle);color:#fff}
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:18px}
+.card-title{font-size:14px;font-weight:700;color:var(--blue);margin-bottom:14px;display:flex;align-items:center;gap:8px;justify-content:space-between}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px}
+.stat-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px}
+.stat-val{font-size:28px;font-weight:800;line-height:1;color:var(--blue)}
+.stat-sub{font-size:11px;color:var(--muted);margin-top:3px}
+.stat.gold .stat-val{color:var(--gold)}.stat.green .stat-val{color:var(--green)}.stat.red .stat-val{color:var(--red)}
+.canal-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.canal-tile{border:1px solid var(--border);border-radius:6px;padding:10px;cursor:pointer;background:var(--white);transition:box-shadow .15s,transform .1s}
+.canal-tile:hover{box-shadow:var(--shadow);transform:translateY(-1px)}
+.ct-num{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase}
+.ct-salas{display:flex;gap:3px;margin-top:6px;flex-wrap:wrap}
+.sala-dot{width:30px;height:21px;border-radius:4px;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer}
+.sd1{background:var(--s1)}.sd2{background:var(--s2)}.sd3{background:var(--s3)}.sd4{background:var(--s4)}.sd-libre{background:#dce3ec;color:#8a9ab2}
+.legend-row{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
+.leg-dot{width:11px;height:11px;border-radius:3px}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:700px}
+th{text-align:left;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;padding:8px 12px;border-bottom:2px solid var(--border);white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--blue-xlight)}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700}
+.b-blue{background:var(--blue-light);color:var(--blue)}.b-green{background:var(--green-light);color:var(--green)}
+.b-gold{background:var(--gold-light);color:#7a5a10}.b-red{background:var(--red-light);color:var(--red)}
+.b-purple{background:var(--purple-light);color:var(--purple)}
+.sala-tag{font-size:11px;font-weight:700;color:#fff;padding:2px 8px;border-radius:4px;display:inline-block}
+.row-actions{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+.grilla-wrap{overflow-x:auto}
+.grilla{display:grid;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;min-width:600px}
+.gh{background:var(--blue);color:#fff;padding:10px 12px;font-size:11px;font-weight:700;text-align:center;letter-spacing:.5px}
+.gh-label{background:var(--blue-xlight);color:var(--blue);font-weight:700}
+.gcell{padding:8px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);font-size:11px;line-height:1.4;min-height:56px}
+.gcell:last-child{border-right:none}
+.gc-canal{background:var(--blue-light);font-weight:700;color:var(--blue);font-size:12px;display:flex;align-items:center}
+.gc-used{background:var(--white);cursor:pointer}.gc-used:hover{background:var(--blue-xlight)}
+.gc-libre{background:#f8f9fb;color:#aab;font-size:10px;text-align:center;display:flex;align-items:center;justify-content:center}
+.gc-name{font-weight:600;color:var(--blue);font-size:10px;margin-bottom:1px}
+.gc-mat{color:var(--muted);font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px}
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-group.full{grid-column:1/-1}
+.form-group.third{grid-column:span 1}
+.form-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.form-input{padding:9px 11px;border:1px solid var(--border);border-radius:6px;font-size:13px;color:var(--text);background:var(--white);width:100%;transition:border .15s;font-family:inherit}
+.form-input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,51,102,.08)}
+.form-input:disabled{background:#f0f2f5;color:var(--muted)}
+select.form-input{cursor:pointer}
+textarea.form-input{resize:vertical;min-height:70px}
+.form-hint{font-size:11px;color:var(--muted);margin-top:2px}
+/* Docente selector row */
+.docente-row{display:flex;gap:8px;align-items:flex-end}
+.docente-row .form-input{flex:1}
+/* MSG Preview */
+.msg-preview{background:var(--blue-xlight);border-left:3px solid var(--blue);border-radius:0 6px 6px 0;padding:12px 14px;font-size:12px;line-height:1.7;font-family:'Courier New',monospace;white-space:pre-wrap;word-break:break-word;color:var(--text)}
+/* Notif buttons block */
+.notif-block{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px;padding:12px;background:var(--gray);border-radius:8px;border:1px solid var(--border)}
+.notif-block-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;width:100%;margin-bottom:4px}
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,20,60,.45);z-index:100;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--white);border-radius:10px;width:100%;max-width:560px;box-shadow:0 8px 40px rgba(0,20,80,.2);overflow:hidden;max-height:90vh;overflow-y:auto}
+.modal-lg{max-width:680px}
+.modal-header{background:var(--blue);padding:16px 20px;display:flex;align-items:center;justify-content:space-between}
+.modal-title{color:#fff;font-size:15px;font-weight:700}
+.modal-close{color:rgba(255,255,255,.7);font-size:20px;cursor:pointer;line-height:1;border:none;background:none;padding:2px 6px}
+.modal-close:hover{color:#fff}
+.modal-body{padding:20px}
+.modal-sala-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.sala-card{border:1px solid var(--border);border-radius:8px;padding:13px;cursor:pointer;transition:all .15s}
+.sala-card:hover{border-color:var(--blue);box-shadow:0 2px 8px rgba(0,51,102,.1)}
+.sc-header{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.sc-badge{width:28px;height:28px;border-radius:6px;font-size:11px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center}
+.sc-hora{font-size:12px;font-weight:700;color:var(--muted)}
+.sc-docente{font-size:13px;font-weight:700;color:var(--blue);margin-bottom:2px}
+.sc-materia{font-size:11px;color:var(--muted)}
+.sc-free{font-size:12px;color:var(--muted);text-align:center;padding:8px 0}
+.modal-canal-info{background:var(--blue-xlight);border-radius:6px;padding:12px;margin-bottom:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mci-item{font-size:12px}
+.mci-label{color:var(--muted);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.mci-val{color:var(--blue);font-weight:600;margin-top:1px;word-break:break-all}
+/* ABM docentes */
+.abm-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.docente-card{border:1px solid var(--border);border-radius:8px;padding:12px;position:relative}
+.docente-card:hover{border-color:var(--blue-mid);box-shadow:var(--shadow)}
+.dc-name{font-weight:700;color:var(--blue);font-size:14px;margin-bottom:4px}
+.dc-info{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:2px}
+.dc-actions{display:flex;gap:6px;margin-top:10px}
+.dc-badge{display:inline-flex;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:700;margin-bottom:4px}
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--blue);color:#fff;padding:12px 18px;border-radius:8px;font-size:13px;font-weight:600;box-shadow:var(--shadow);z-index:200;transform:translateY(80px);opacity:0;transition:all .3s;max-width:320px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{background:var(--green)}.toast.error{background:var(--red)}.toast.warning{background:var(--gold)}
+.search-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.search-input{padding:8px 11px;border:1px solid var(--border);border-radius:6px;font-size:13px;width:220px}
+.search-input:focus{outline:none;border-color:var(--blue)}
+.filter-sel{padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;color:var(--text);background:var(--white);cursor:pointer}
+.filter-sel:focus{outline:none;border-color:var(--blue)}
+.sync-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px}
+.sync-dot.ok{background:var(--green)}.sync-dot.loading{background:var(--gold);animation:pulse 1s infinite}.sync-dot.err{background:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:18px}
+.tab{padding:9px 16px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s}
+.tab:hover{color:var(--blue)}.tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.url-setup{background:var(--gold-light);border:1px solid #e8c870;border-radius:8px;padding:16px;margin-bottom:18px;display:flex;align-items:flex-start;gap:12px}
+.url-text h3{color:#7a5a10;font-size:13px;font-weight:700;margin-bottom:4px}
+.url-text p{color:#8a6a20;font-size:12px;margin-bottom:8px}
+.url-input-row{display:flex;gap:8px}
+.url-field{flex:1;padding:8px 11px;border:1px solid #e0c060;border-radius:6px;font-size:13px}
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty-icon{font-size:40px;margin-bottom:10px;opacity:.4}
+.view{display:none}.view.active{display:flex;flex-direction:column;gap:20px}
+.import-zone{border:2px dashed var(--border);border-radius:8px;padding:24px;text-align:center;cursor:pointer;transition:border-color .15s}
+.import-zone:hover{border-color:var(--blue)}
+.import-zone p{color:var(--muted);font-size:13px;margin-top:6px}
+/* Highlight docente nuevo */
+.new-docente-highlight{background:var(--green-light);border-color:var(--green)!important}
+/* Quick add inline */
+.quick-add-bar{display:none;background:var(--green-light);border:1px solid var(--green);border-radius:8px;padding:12px;margin-top:8px;gap:8px;flex-wrap:wrap;align-items:flex-end}
+.quick-add-bar.visible{display:flex}
+.quick-add-bar .form-input{padding:7px 10px;font-size:12px}
+/* info panel */
+.info-panel{background:var(--blue-xlight);border-left:3px solid var(--blue);border-radius:0 8px 8px 0;padding:12px 14px;font-size:12px;line-height:1.8}
+.info-panel strong{color:var(--blue)}
+@media(max-width:768px){.sidebar{display:none}.stats-row{grid-template-columns:1fr 1fr}.canal-grid{grid-template-columns:repeat(4,1fr)}.form-grid{grid-template-columns:1fr}.modal-sala-grid{grid-template-columns:1fr}.abm-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- MODAL CANAL DETALLE -->
+<div class="modal-overlay" id="modalCanal">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <div class="modal-title" id="modalCanalTitle">Canal</div>
+      <button class="modal-close" onclick="closeModal('modalCanal')">✕</button>
+    </div>
+    <div class="modal-body" id="modalCanalBody"></div>
+  </div>
+</div>
+
+<!-- MODAL NUEVO DOCENTE RÁPIDO -->
+<div class="modal-overlay" id="modalNuevoDocente">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-header" style="background:var(--green)">
+      <div class="modal-title">➕ Nuevo docente</div>
+      <button class="modal-close" onclick="closeModal('modalNuevoDocente')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="color:var(--muted);font-size:12px;margin-bottom:14px">Completá los datos del docente. Quedará guardado en la base de datos.</p>
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">Apellido *</label><input class="form-input" id="nd_apellido" placeholder="Ej: García"/></div>
+        <div class="form-group"><label class="form-label">Nombre *</label><input class="form-input" id="nd_nombre" placeholder="Ej: María"/></div>
+        <div class="form-group"><label class="form-label">📱 Teléfono WhatsApp</label><input class="form-input" id="nd_tel" placeholder="5493854000000" type="tel"/><span class="form-hint">Código país sin + · ej: 5493854123456</span></div>
+        <div class="form-group"><label class="form-label">✉ Email institucional</label><input class="form-input" id="nd_email" placeholder="docente@unse.edu.ar" type="email"/></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button class="btn btn-green" onclick="guardarNuevoDocente()">💾 Guardar docente</button>
+        <button class="btn btn-ghost" onclick="closeModal('modalNuevoDocente')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITAR DOCENTE -->
+<div class="modal-overlay" id="modalEditDocente">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-header" style="background:var(--blue-mid)">
+      <div class="modal-title">✏️ Editar docente</div>
+      <button class="modal-close" onclick="closeModal('modalEditDocente')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="ed_id"/>
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">Apellido *</label><input class="form-input" id="ed_apellido"/></div>
+        <div class="form-group"><label class="form-label">Nombre *</label><input class="form-input" id="ed_nombre"/></div>
+        <div class="form-group"><label class="form-label">📱 Teléfono WhatsApp</label><input class="form-input" id="ed_tel" type="tel"/><span class="form-hint">Código país sin + · ej: 5493854123456</span></div>
+        <div class="form-group"><label class="form-label">✉ Email institucional</label><input class="form-input" id="ed_email" type="email"/></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button class="btn btn-primary" onclick="actualizarDocente()">💾 Guardar cambios</button>
+        <button class="btn btn-ghost" onclick="closeModal('modalEditDocente')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAR ELIMINAR -->
+<div class="modal-overlay" id="modalDel">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-header"><div class="modal-title">Confirmar eliminación</div><button class="modal-close" onclick="closeModal('modalDel')">✕</button></div>
+    <div class="modal-body">
+      <p style="margin-bottom:16px;color:var(--muted)" id="delMsg">¿Eliminar? Esta acción no se puede deshacer.</p>
+      <div style="display:flex;gap:10px"><button class="btn btn-red" id="confirmDelBtn">Eliminar</button><button class="btn btn-ghost" onclick="closeModal('modalDel')">Cancelar</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="app">
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-badge">EIE · UNSE</div>
+    <div class="sb-title">Canales Zoom</div>
+    <div class="sb-sub">Plataforma Virtual 2026</div>
+  </div>
+  <nav>
+    <div class="nav-sec">Principal</div>
+    <div class="nav-item active" onclick="showView('dashboard',this)"><i class="nav-ico">⊞</i>Dashboard</div>
+    <div class="nav-item" onclick="showView('grilla',this)"><i class="nav-ico">▦</i>Grilla horaria</div>
+    <div class="nav-sec">Asignaciones</div>
+    <div class="nav-item" onclick="showView('docentes',this)"><i class="nav-ico">↗</i>Por docente <span class="nav-count" id="navCount">0</span></div>
+    <div class="nav-item" onclick="showView('nuevo',this)"><i class="nav-ico">＋</i>Nueva asignación</div>
+    <div class="nav-sec">Docentes</div>
+    <div class="nav-item" onclick="showView('abm',this)"><i class="nav-ico">👤</i>Base de docentes <span class="nav-count" id="navDocCount">0</span></div>
+    <div class="nav-sec">Herramientas</div>
+    <div class="nav-item" onclick="showView('mensajes',this)"><i class="nav-ico">✉</i>Mensajes / Notif.</div>
+    <div class="nav-item" onclick="showView('config',this)"><i class="nav-ico">⚙</i>Configuración</div>
+  </nav>
+  <div class="sb-footer">EIE UNSE · Gestión Zoom v2.0</div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div class="tb-title" id="topbarTitle">Dashboard</div>
+    <div class="tb-sync"><span class="sync-dot loading" id="syncDot"></span><span id="syncText">Cargando…</span></div>
+    <button class="btn btn-ghost btn-sm" onclick="syncData()">↻ Sincronizar</button>
+    <button class="btn btn-gold" onclick="showView('nuevo',null);resetForm()">+ Nueva asignación</button>
+  </header>
+
+  <main class="content">
+
+  <!-- DASHBOARD -->
+  <div class="view active" id="view-dashboard">
+    <div class="url-setup" id="urlSetupBanner" style="display:none">
+      <div style="font-size:24px;flex-shrink:0">⚙️</div>
+      <div class="url-text">
+        <h3>Configurar conexión con Google Sheets</h3>
+        <p>Pegá la URL de tu Google Apps Script Web App para sincronizar datos.</p>
+        <div class="url-input-row">
+          <input class="url-field" id="quickUrlInput" placeholder="https://script.google.com/macros/s/…/exec"/>
+          <button class="btn btn-gold btn-sm" onclick="saveUrlFromBanner()">Guardar y conectar</button>
+        </div>
+      </div>
+    </div>
+    <div class="stats-row">
+      <div class="stat"><div class="stat-label">Canales activos</div><div class="stat-val" id="statCanales">—</div><div class="stat-sub">+ Mesa de Ayuda</div></div>
+      <div class="stat gold"><div class="stat-label">Salas asignadas</div><div class="stat-val" id="statAsignadas">—</div><div class="stat-sub">de 116 posibles</div></div>
+      <div class="stat green"><div class="stat-label">Docentes en BD</div><div class="stat-val" id="statDocentes">—</div><div class="stat-sub">registrados</div></div>
+      <div class="stat red"><div class="stat-label">Salas libres</div><div class="stat-val" id="statLibres">—</div><div class="stat-sub">disponibles</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Mapa de canales · Estado actual <span style="font-size:12px;font-weight:400;color:var(--muted)">Clic para ver detalle</span></div>
+      <div class="legend-row">
+        <div class="leg-item"><div class="leg-dot" style="background:var(--s1)"></div>S1 · 18-20h</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--s2)"></div>S2 · 20-22h</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--s3)"></div>S3 · 08-10h</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--s4)"></div>S4 · 10-12h</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#dce3ec"></div>Libre</div>
+      </div>
+      <div class="canal-grid" id="canalGrid"></div>
+    </div>
+  </div>
+
+  <!-- GRILLA -->
+  <div class="view" id="view-grilla">
+    <div class="card">
+      <div class="card-title">Grilla horaria · Canales × Salas</div>
+      <div class="grilla-wrap"><div class="grilla" id="grillaContent" style="grid-template-columns:120px repeat(4,1fr)">
+        <div class="gh gh-label">Canal</div>
+        <div class="gh">Sala 1 · 18-20h</div><div class="gh">Sala 2 · 20-22h</div>
+        <div class="gh">Sala 3 · 08-10h</div><div class="gh">Sala 4 · 10-12h</div>
+      </div></div>
+    </div>
+  </div>
+
+  <!-- ASIGNACIONES -->
+  <div class="view" id="view-docentes">
+    <div class="card">
+      <div class="card-title">Asignaciones por docente
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost btn-sm" onclick="exportCSV()">↓ CSV</button>
+          <button class="btn btn-primary btn-sm" onclick="showView('nuevo',null);resetForm()">+ Nueva</button>
+        </div>
+      </div>
+      <div class="search-row">
+        <input class="search-input" id="searchInput" placeholder="Buscar docente o materia…" oninput="filterTable()"/>
+        <select class="filter-sel" id="filterCarrera" onchange="filterTable()">
+          <option value="">Todas las carreras</option><option>LGE</option><option>LEI</option><option>LEP</option><option>AGE</option>
+        </select>
+        <select class="filter-sel" id="filterSala" onchange="filterTable()">
+          <option value="">Todos los turnos</option>
+          <option value="1">Sala 1 · 18-20h</option><option value="2">Sala 2 · 20-22h</option>
+          <option value="3">Sala 3 · 08-10h</option><option value="4">Sala 4 · 10-12h</option>
+        </select>
+        <select class="filter-sel" id="filterEstado" onchange="filterTable()">
+          <option value="">Todos los estados</option><option value="activo">Activo</option><option value="finalizado">Finalizado</option>
+        </select>
+      </div>
+      <div class="tbl-wrap">
+        <table id="asigTable">
+          <thead><tr>
+            <th>Docente</th><th>Materia</th><th>Carrera</th>
+            <th>Canal · Sala</th><th>Horario</th><th>Período</th>
+            <th>Estado</th><th>Notificar</th><th>Acciones</th>
+          </tr></thead>
+          <tbody id="asigTableBody"></tbody>
+        </table>
+      </div>
+      <div id="tableEmpty" class="empty" style="display:none"><div class="empty-icon">📋</div><p>Sin asignaciones. Usá los filtros o creá una nueva.</p></div>
+    </div>
+  </div>
+
+  <!-- NUEVA ASIGNACIÓN -->
+  <div class="view" id="view-nuevo">
+    <div class="card">
+      <div class="card-title" id="formTitle">Nueva asignación</div>
+      <form id="asigForm" onsubmit="submitForm(event)">
+        <input type="hidden" id="editId"/>
+        <div class="form-grid">
+
+          <!-- BLOQUE DOCENTE -->
+          <div class="form-group full">
+            <label class="form-label">Docente *</label>
+            <div style="display:flex;gap:8px;align-items:center">
+              <select class="form-input" id="f_docente" onchange="onDocenteSelect()" style="flex:1" required>
+                <option value="">— Seleccionar docente de la BD —</option>
+              </select>
+              <button type="button" class="btn btn-green btn-sm" onclick="openModalNuevoDocente()" title="Agregar nuevo docente a la BD">➕ Nuevo docente</button>
+            </div>
+            <span class="form-hint">Si el docente no está en la lista, hacé clic en "Nuevo docente" para darlo de alta.</span>
+          </div>
+
+          <!-- DATOS AUTO-RELLENADOS DEL DOCENTE -->
+          <div class="form-group" id="grp_tel">
+            <label class="form-label">📱 Teléfono WhatsApp</label>
+            <input class="form-input" id="f_telefono" placeholder="5493854000000" type="tel"/>
+            <span class="form-hint">Se autocompleta desde la BD. Podés editarlo.</span>
+          </div>
+          <div class="form-group" id="grp_email">
+            <label class="form-label">✉ Email</label>
+            <input class="form-input" id="f_email" placeholder="docente@unse.edu.ar" type="email"/>
+            <span class="form-hint">Se autocompleta desde la BD. Podés editarlo.</span>
+          </div>
+
+          <!-- MATERIA / CARRERA / ETC -->
+          <div class="form-group full"><label class="form-label">Materia / Módulo *</label>
+            <input class="form-input" id="f_materia" placeholder="Ej: Enfoque Socio-Cultural de la Educación" required/>
+          </div>
+          <div class="form-group"><label class="form-label">Carrera *</label>
+            <select class="form-input" id="f_carrera" required><option value="LGE">LGE</option><option value="LEI">LEI</option><option value="LEP">LEP</option><option value="AGE">AGE</option></select>
+          </div>
+          <div class="form-group"><label class="form-label">Cohorte</label>
+            <select class="form-input" id="f_cohorte"><option>2026</option><option>2025</option><option>2024</option><option>2023</option></select>
+          </div>
+          <div class="form-group"><label class="form-label">Comisión</label>
+            <input class="form-input" id="f_comision" placeholder="Ej: 1" type="number" min="1" max="30"/>
+          </div>
+          <div class="form-group"><label class="form-label">Estado</label>
+            <select class="form-input" id="f_estado"><option value="activo">Activo</option><option value="finalizado">Finalizado</option><option value="suspendido">Suspendido</option></select>
+          </div>
+
+          <!-- CANAL / SALA -->
+          <div class="form-group"><label class="form-label">Canal *</label>
+            <select class="form-input" id="f_canal" onchange="onCanalChange()" required>
+              <option value="">— Seleccionar canal —</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">Sala / Horario *</label>
+            <select class="form-input" id="f_sala" onchange="onSalaChange()" required>
+              <option value="">— Elegir canal primero —</option>
+            </select>
+          </div>
+
+          <!-- FECHAS -->
+          <div class="form-group"><label class="form-label">Fecha inicio *</label><input class="form-input" id="f_fecha_inicio" type="date" required/></div>
+          <div class="form-group"><label class="form-label">Fecha fin *</label><input class="form-input" id="f_fecha_fin" type="date" required/></div>
+          <div class="form-group full"><label class="form-label">Observaciones</label><input class="form-input" id="f_obs" placeholder="Notas adicionales…"/></div>
+
+          <!-- LINK CALCULADO -->
+          <div class="form-group full" id="linkPreviewGroup" style="display:none">
+            <label class="form-label">🔗 Link Zoom asignado</label>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input class="form-input" id="f_link_preview" readonly/>
+              <button type="button" class="btn btn-ghost btn-sm" onclick="copyLink()">📋 Copiar</button>
+              <a id="f_link_open" href="#" target="_blank" class="btn btn-primary btn-sm">Abrir</a>
+            </div>
+          </div>
+
+          <!-- MENSAJE PREVIEW -->
+          <div class="form-group full" id="msgPreviewGroup" style="display:none">
+            <label class="form-label">Vista previa del mensaje</label>
+            <div class="msg-preview" id="msgPreview"></div>
+          </div>
+
+          <!-- BOTONES DE NOTIFICACIÓN -->
+          <div class="form-group full" id="notifBlock" style="display:none">
+            <div class="notif-block">
+              <div class="notif-block-title">📤 Notificar al docente</div>
+              <button type="button" class="btn btn-wa" id="btnWA" onclick="openWA()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.131.558 4.13 1.535 5.865L0 24l6.316-1.508A11.955 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.007-1.372l-.36-.214-3.733.891.933-3.642-.235-.374A9.818 9.818 0 1112 21.818z"/></svg>
+                WhatsApp
+              </button>
+              <button type="button" class="btn btn-horde" id="btnHorde" onclick="openHorde()">
+                📧 Correo (Horde)
+              </button>
+              <button type="button" class="btn btn-moodle" id="btnMoodle" onclick="openMoodle()">
+                🎓 Mensajería Moodle
+              </button>
+              <button type="button" class="btn btn-ghost btn-sm" onclick="copyMsg()">📋 Copiar mensaje</button>
+              <span id="notifSinTel" style="font-size:11px;color:var(--red);display:none">⚠ Sin teléfono → WA no disponible</span>
+              <span id="notifSinEmail" style="font-size:11px;color:var(--red);display:none">⚠ Sin email → Correo no disponible</span>
+            </div>
+          </div>
+
+        </div>
+        <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap">
+          <button type="submit" class="btn btn-primary" id="formSubmitBtn">💾 Guardar asignación</button>
+          <button type="button" class="btn btn-ghost" onclick="resetForm()">✕ Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ABM DOCENTES -->
+  <div class="view" id="view-abm">
+    <div class="card">
+      <div class="card-title">Base de docentes
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost btn-sm" onclick="exportDocentesCSV()">↓ Exportar CSV</button>
+          <button class="btn btn-green" onclick="openModalNuevoDocente()">➕ Nuevo docente</button>
+        </div>
+      </div>
+      <div class="search-row">
+        <input class="search-input" id="abmSearch" placeholder="Buscar docente…" oninput="renderABM()"/>
+  
+      </div>
+      <div class="abm-grid" id="abmGrid"></div>
+      <div id="abmEmpty" class="empty" style="display:none"><div class="empty-icon">👤</div><p>No hay docentes registrados. Importá un CSV o agregá individualmente.</p></div>
+      <div style="margin-top:14px">
+        <div class="import-zone" onclick="document.getElementById('csvInput').click()">
+          <div style="font-size:28px">📂</div>
+          <p>Importar CSV · Columnas requeridas: apellido, nombre · Opcionales: telefono, email · La carrera se registra en cada asignación, no en el docente</p>
+          <input type="file" id="csvInput" accept=".csv" style="display:none" onchange="importCSV(event)"/>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MENSAJES -->
+  <div class="view" id="view-mensajes">
+    <div class="card">
+      <div class="card-title">Centro de notificaciones</div>
+      <div class="tabs">
+        <div class="tab active" onclick="msgTab('individual',this)">Envío individual</div>
+        <div class="tab" onclick="msgTab('masivo',this)">Selección masiva</div>
+      </div>
+      <!-- Individual -->
+      <div id="msgTabIndividual">
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">Seleccionar docente</label>
+            <select class="form-input" id="msg_docente" onchange="onMsgDocenteChange()"><option value="">— Seleccionar —</option></select>
+          </div>
+          <div class="form-group"><label class="form-label">Teléfono (editable)</label><input class="form-input" id="msg_tel" placeholder="5493854000000"/></div>
+          <div class="form-group"><label class="form-label">Email (editable)</label><input class="form-input" id="msg_email" placeholder="docente@unse.edu.ar"/></div>
+          <div class="form-group"><label class="form-label">Asignación a notificar</label>
+            <select class="form-input" id="msg_asig" onchange="onMsgAsigChange()"><option value="">— Seleccionar asignación —</option></select>
+          </div>
+          <div class="form-group full" id="msgCentroPreview" style="display:none">
+            <label class="form-label">Mensaje generado</label>
+            <div class="msg-preview" id="msgPreviewWA"></div>
+            <div class="notif-block" style="margin-top:10px">
+              <div class="notif-block-title">📤 Enviar notificación</div>
+              <button class="btn btn-wa" onclick="openWAMsg()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.131.558 4.13 1.535 5.865L0 24l6.316-1.508A11.955 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.007-1.372l-.36-.214-3.733.891.933-3.642-.235-.374A9.818 9.818 0 1112 21.818z"/></svg>
+                WhatsApp
+              </button>
+              <button class="btn btn-horde" onclick="openHordeMsg()">📧 Correo (Horde)</button>
+              <button class="btn btn-moodle" onclick="openMoodleMsg()">🎓 Moodle</button>
+              <button class="btn btn-ghost btn-sm" onclick="copyMsgWA()">📋 Copiar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Masivo -->
+      <div id="msgTabMasivo" style="display:none">
+        <div class="search-row">
+          <input class="search-input" id="masivo_search" placeholder="Filtrar…" oninput="renderMasivoTable()"/>
+          <button class="btn btn-ghost btn-sm" onclick="selectAllMasivo()">☑ Todos</button>
+          <span id="masivoCount" style="font-size:12px;color:var(--muted);margin-left:4px">0 seleccionados</span>
+        </div>
+        <div class="tbl-wrap">
+          <table><thead><tr>
+            <th><input type="checkbox" id="chkAll" onchange="toggleAll(this)"/></th>
+            <th>Docente</th><th>Materia</th><th>Canal·Sala</th><th>Tel</th><th>Email</th><th>Enviar</th>
+          </tr></thead><tbody id="masivoBody"></tbody></table>
+        </div>
+        <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+          <button class="btn btn-wa" onclick="sendMasivoWA()">WhatsApp masivo</button>
+          <button class="btn btn-horde" onclick="sendMasivoHorde()">📧 Email masivo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIG -->
+  <div class="view" id="view-config">
+    <div class="card">
+      <div class="card-title">Configuración</div>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label class="form-label">URL Google Apps Script Web App</label>
+          <div style="display:flex;gap:8px">
+            <input class="form-input" id="configUrl" placeholder="https://script.google.com/macros/s/…/exec"/>
+            <button class="btn btn-primary" onclick="saveConfig()">Guardar</button>
+          </div>
+          <span class="form-hint">Pegá la URL que te da Apps Script al desplegar la Web App.</span>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Pasos de instalación</label>
+          <div class="info-panel">
+            <strong>1.</strong> Creá un Google Sheet nuevo → copiá el ID de la URL.<br/>
+            <strong>2.</strong> Abrí <strong>Extensiones → Apps Script</strong> dentro del Sheet.<br/>
+            <strong>3.</strong> Pegá el código del archivo <code>apps_script.js</code> y reemplazá <code>TU_SPREADSHEET_ID_AQUI</code> con tu ID.<br/>
+            <strong>4.</strong> Ejecutá la función <strong>setup_inicial()</strong> una sola vez.<br/>
+            <strong>5.</strong> Ir a <strong>Implementar → Nueva implementación → App web</strong> → Ejecutar como: Yo · Acceso: Cualquier persona.<br/>
+            <strong>6.</strong> Copiá la URL y pegala arriba.<br/>
+          </div>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Acciones de datos</label>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-ghost btn-sm" onclick="syncData()">↻ Sincronizar</button>
+            <button class="btn btn-ghost btn-sm" onclick="exportCSV()">↓ Exportar asignaciones CSV</button>
+            <button class="btn btn-ghost btn-sm" onclick="exportDocentesCSV()">↓ Exportar docentes CSV</button>
+            <button class="btn btn-red btn-sm" onclick="clearLocal()">🗑 Limpiar datos locales</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </main>
+</div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+//  EIE UNSE · Gestión Canales Zoom v2.0
+// ══════════════════════════════════════════════
+const APP={scriptUrl:localStorage.getItem('eie_script_url')||'',canales:[],asignaciones:[],docentes:[],editMode:false,_currentMsg:'',_currentEmail:'',_currentDocEmail:''};
+const SALA_LABELS={1:'Sala 1 · 18-20h',2:'Sala 2 · 20-22h',3:'Sala 3 · 08-10h',4:'Sala 4 · 10-12h'};
+const SALA_COLORS={1:'var(--s1)',2:'var(--s2)',3:'var(--s3)',4:'var(--s4)'};
+const CARRERA_COLOR={LGE:'b-blue',LEI:'b-green',LEP:'b-gold',AGE:'b-purple'};
+
+const CANALES_BASE=[
+  {canal_num:'1',sala_num:'1',horario:'18:00-20:00',enlace_zoom:'https://us02web.zoom.us/j/88031858042?pwd=0uFbKPJtViEUA8WKvTiriboCIQ4Gih.1',usuario:'eiecz01@eie.unse.edu.ar',contrasena:'Canal01eie2026'},
+  {canal_num:'1',sala_num:'2',horario:'20:00-22:00',enlace_zoom:'https://us02web.zoom.us/j/89424921251?pwd=ws4xXjVvaXQ0VzPPeFDtkeeoQ2UMRI.1',usuario:'eiecz01@eie.unse.edu.ar',contrasena:'Canal01eie2026'},
+  {canal_num:'1',sala_num:'3',horario:'08:00-10:00',enlace_zoom:'https://us02web.zoom.us/j/88072817996?pwd=Sl8qUMfHanZzzF15uBwtmiMk7BBibk.1',usuario:'eiecz01@eie.unse.edu.ar',contrasena:'Canal01eie2026'},
+  {canal_num:'1',sala_num:'4',horario:'10:00-12:00',enlace_zoom:'https://us02web.zoom.us/j/81402945204?pwd=Ads2TJawxlzxcm6kxNCa7HoygBOE5T.1',usuario:'eiecz01@eie.unse.edu.ar',contrasena:'Canal01eie2026'},
+  {canal_num:'2',sala_num:'1',horario:'18:00-20:00',enlace_zoom:'https://us02web.zoom.us/j/85490880268?pwd=2PiaamwvRtxWI43NJxmbdJdeW7OtaV.1',usuario:'eiecz02@eie.unse.edu.ar',contrasena:'Canal02eie2026'},
+  {canal_num:'2',sala_num:'2',horario:'20:00-22:00',enlace_zoom:'https://us02web.zoom.us/j/86705105596?pwd=x3Uf3zjbineVmgv9PtJLwSXQ6cRcZa.1',usuario:'eiecz02@eie.unse.edu.ar',contrasena:'Canal02eie2026'},
+  {canal_num:'2',sala_num:'3',horario:'08:00-10:00',enlace_zoom:'https://us02web.zoom.us/j/89316525161?pwd=9RMey4nML2rTOvauhiEPchyhSPEJtF.1',usuario:'eiecz02@eie.unse.edu.ar',contrasena:'Canal02eie2026'},
+  {canal_num:'2',sala_num:'4',horario:'10:00-12:00',enlace_zoom:'https://us02web.zoom.us/j/87236664335?pwd=r6CmDXGPkgntiiYXb6dHwNXJ1IN8vi.1',usuario:'eiecz02@eie.unse.edu.ar',contrasena:'Canal02eie2026'},
+  {canal_num:'3',sala_num:'1',horario:'18:00-20:00',enlace_zoom:'https://us02web.zoom.us/j/84720622737?pwd=lhiOM6ZyMq54b5R9wp0r5j9tBhfUJe.1',usuario:'eiecz03@eie.unse.edu.ar',contrasena:'Canal03eie2026'},
+  {canal_num:'3',sala_num:'2',horario:'20:00-22:00',enlace_zoom:'https://us02web.zoom.us/j/83568295455?pwd=St6Wi0GHoHDT8cR62hBa4Eug2Bahbn.1',usuario:'eiecz03@eie.unse.edu.ar',contrasena:'Canal03eie2026'},
+  {canal_num:'3',sala_num:'3',horario:'08:00-10:00',enlace_zoom:'https://us02web.zoom.us/j/82611203933?pwd=b2y04TrqTYyvh4DsnKx4DRgive5ILH.1',usuario:'eiecz03@eie.unse.edu.ar',contrasena:'Canal03eie2026'},
+  {canal_num:'3',sala_num:'4',horario:'10:00-12:00',enlace_zoom:'https://us02web.zoom.us/j/88187303170?pwd=b2be72Z1CXcEDPbJs3VPemrzVp4lIk.1',usuario:'eiecz03@eie.unse.edu.ar',contrasena:'Canal03eie2026'},
+  {canal_num:'4',sala_num:'1',horario:'18:00-20:00',enlace_zoom:'https://us02web.zoom.us/j/82625003208?pwd=j8Czm7CnIXAnjqewG1uXA9rnBRA2mk.1',usuario:'eiecz04@eie.unse.edu.ar',contrasena:'Canal04eie2026'},
+  {canal_num:'4',sala_num:'2',horario:'20:00-22:00',enlace_zoom:'https://us02web.zoom.us/j/86400429488?pwd=16k50dXk6ezmmvqcHVwXmZcHR3nMh4.1',usuario:'eiecz04@eie.unse.edu.ar',contrasena:'Canal04eie2026'},
+  {canal_num:'4',sala_num:'3',horario:'08:00-10:00',enlace_zoom:'https://us02web.zoom.us/j/86842069421?pwd=bqhhfWhREV1jUXxunoSCMbhF4gELng.1',usuario:'eiecz04@eie.unse.edu.ar',contrasena:'Canal04eie2026'},
+  {canal_num:'4',sala_num:'4',horario:'10:00-12:00',enlace_zoom:'https://us02web.zoom.us/j/81465398641?pwd=EXpXfFvRzjKGU4Lrahtd2MsJWrtaNz.1',usuario:'eiecz04@eie.unse.edu.ar',contrasena:'Canal04eie2026'},
+  {canal_num:'5',sala_num:'1',horario:'18:00-20:00',enlace_zoom:'https://us02web.zoom.us/j/89358622642?pwd=ZAml8knWErhm3zkbPCOCox3QybA1uH.1',usuario:'eiecz05@eie.unse.edu.ar',contrasena:'Canal05eie2026'},
+  {canal_num:'5',sala_num:'2',horario:'20:00-22:00',enlace_zoom:'https://us02web.zoom.us/j/83397355233?pwd=iNHl6lbATVRhIJHjhvF4NjNbNbbQkK.1',usuario:'eiecz05@eie.unse.edu.ar',contrasena:'Canal05eie2026'},
+  {canal_num:'5',sala_num:'3',horario:'08:00-10:00',enlace_zoom:'https://us02web.zoom.us/j/85740012076?pwd=6vEAcf512oyknKikuwXQrx6vAuMnLs.1',usuario:'eiecz05@eie.unse.edu.ar',contrasena:'Canal05eie2026'},
+  {canal_num:'5',sala_num:'4',horario:'10:00-12:00',enlace_zoom:'https://us02web.zoom.us/j/84780347714?pwd=9rgvqALjv9GwaedeEDF8nDEf6Gp9Ls.1',usuario:'eiecz05@eie.unse.edu.ar',contrasena:'Canal05eie2026'},
+  {canal_num:'6',sala_num:'1',horario:'18:00-20:00',enlace_zoom:'https://us02web.zoom.us/j/86814180791?pwd=i40bHRLWXTANha3KYCbLL0VKbfbUrv.1',usuario:'eiecz06@eie.unse.edu.ar',contrasena:'Canal06eie2026'},
+  {canal_num:'6',sala_num:'2',horario:'20:00-22:00',enlace_zoom:'https://us02web.zoom.us/j/82360697490?pwd=9npzxY31JwcSYbNMkcC82xi4DvilBa.1',usuario:'eiecz06@eie.unse.edu.ar',contrasena:'Canal06eie2026'},
+  {canal_num:'6',sala_num:'3',horario:'08:00-10:00',enlace_zoom:'https://us02web.zoom.us/j/87447284394?pwd=NaWEdJSia0sMlW8fkKvhEHXhDHWLMZ.1',usuario:'eiecz06@eie.unse.edu.ar',contrasena:'Canal06eie2026'},
+  {canal_num:'6',sala_num:'4',horario:'10:00-12:00',enlace_zoom:'https://us02web.zoom.us/j/81294532365?pwd=3EZqiuxcuoFgJoPoiJeHbLzeFOkfFR.1',usuario:'eiecz06@eie.unse.edu.ar',contrasena:'Canal06eie2026'},
+  {canal_num:'7',sala_num:'1',horario:'18:00-20:00',enlace_zoom:'https://us02web.zoom.us/j/89262240186?pwd=IpNreGr0o3NYqt8TdcU6pI6agvdbjP.1',usuario:'eiecz07@eie.unse.edu.ar',contrasena:'Canal07eie2026'},
+  {canal_num:'7',sala_num:'2',horario:'20:00-22:00',enlace_zoom:'https://us02web.zoom.us/j/85187330237?pwd=47OmUmE0OLzbnHlO5AjMZqZV6T8W4W.1',usuario:'eiecz07@eie.unse.edu.ar',contrasena:'Canal07eie2026'},
+  {canal_num:'7',sala_num:'3',horario:'08:00-10:00',enlace_zoom:'https://us02web.zoom.us/j/87906546138?pwd=Gt3zKxBzoffbS02BV5fDKRs8zn2fAU.1',usuario:'eiecz07@eie.unse.edu.ar',contrasena:'Canal07eie2026'},
+  {canal_num:'7',sala_num:'4',horario:'10:00-12:00',enlace_zoom:'https://us02web.zoom.us/j/81299971153?pwd=wWKt0qGNQC648rOTMEw4g1kiaB4Iyj.1',usuario:'eiecz07@eie.unse.edu.ar',contrasena:'Canal07eie2026'},
+  {canal_num:'8',sala_num:'1',horario:'18:00-20:00',enlace_zoom:'https://us02web.zoom.us/j/82809675389?pwd=7v7EUjOmd1aXnEjK43ld4zLgrKbRet.1',usuario:'eiecz08@eie.unse.edu.ar',contrasena:'Canal08eie2026'},
+  {canal_num:'8',sala_num:'2',horario:'20:00-22:00',enlace_zoom:'https://us02web.zoom.us/j/83117744281?pwd=4G1zW3RW3GCiT4p8WWMKgTJ946YQee.1',usuario:'eiecz08@eie.unse.edu.ar',contrasena:'Canal08eie2026'},
+  {canal_num:'8',sala_num:'3',horario:'08:00-10:00',enlace_zoom:'https://us02web.zoom.us/j/84225864115?pwd=Hf7FVZo0gdIG18AVvfhbdGCqqBL7q9.1',usuario:'eiecz08@eie.unse.edu.ar',contrasena:'Canal08eie2026'},
+  {canal_num:'8',sala_num:'4',horario:'10:00-12:00',enlace_zoom:'https://us02web.zoom.us/j/81218097504?pwd=xbPh8NH0OnsrCIPfBttbmFTDVwjQpf.1',usuario:'eiecz08@eie.unse.edu.ar',contrasena:'Canal08eie2026'},
+  {canal_num:'9',sala_num:'1',horario:'18:00-20:00',enlace_zoom:'https://us02web.zoom.us/j/84688627278?pwd=rK36TDwzpukzaiNPHukWpuCHCNbwBV.1',usuario:'eiecz09@eie.unse.edu.ar',contrasena:'Canal09eie2026'},
+  {canal_num:'9',sala_num:'2',horario:'20:00-22:00',enlace_zoom:'https://us02web.zoom.us/j/83365884336?pwd=UH6pwNxINH5o7EVii5fGItEMTzbPNQ.1',usuario:'eiecz09@eie.unse.edu.ar',contrasena:'Canal09eie2026'},
+  {canal_num:'9',sala_num:'3',horario:'08:00-10:00',enlace_zoom:'https://us02web.zoom.us/j/87607929674?pwd=GZyJD1HyjYSKUX0edSs7Z3HIUQb5HQ.1',usuario:'eiecz09@eie.unse.edu.ar',contrasena:'Canal09eie2026'},
+  {canal_num:'9',sala_num:'4',horario:'10:00-12:00',enlace_zoom:'https://us02web.zoom.us/j/86114837334?pwd=eHosMwjuDUjzyKMEt2NuPVwkiKdOoN.1',usuario:'eiecz09@eie.unse.edu.ar',contrasena:'Canal09eie2026'},
+  {canal_num:'10',sala_num:'1',horario:'18:00-20:00',enlace_zoom:'https://us02web.zoom.us/j/83774726581?pwd=rblklLPwBVAMry7ebJkDDdqjbqgF3W.1',usuario:'eiecz10@eie.unse.edu.ar',contrasena:'Canal10eie2026'},
+  {canal_num:'10',sala_num:'2',horario:'20:00-22:00',enlace_zoom:'https://us02web.zoom.us/j/81101571848?pwd=X6cM4GCjhRQjDbiHKLRHnBbMEpFrmJ.1',usuario:'eiecz10@eie.unse.edu.ar',contrasena:'Canal10eie2026'},
+  {canal_num:'10',sala_num:'3',horario:'08:00-10:00',enlace_zoom:'https://us02web.zoom.us/j/84713256361?pwd=ruvqJpa1Q43bVgouAb1P6BuWOkeIQb.1',usuario:'eiecz10@eie.unse.edu.ar',contrasena:'Canal10eie2026'},
+  {canal_num:'10',sala_num:'4',horario:'10:00-12:00',enlace_zoom:'https://us02web.zoom.us/j/82155699556?pwd=1b7o4gf1sC2ZykO5b3W7yMb9r3w6Tf.1',usuario:'eiecz10@eie.unse.edu.ar',contrasena:'Canal10eie2026'},
+  {canal_num:'11',sala_num:'1',horario:'18:00-20:00',enlace_zoom:'https://us02web.zoom.us/j/81241989463?pwd=uydd7D0D0ohVcQhKDGEf1NvkxLWx8b.1',usuario:'eiecz11@eie.unse.edu.ar',contrasena:'Canal11eie2026'},
+  {canal_num:'11',sala_num:'2',horario:'20:00-22:00',enlace_zoom:'https://us02web.zoom.us/j/85480135894?pwd=ZMXZdhVRaYMDMNbqjudBykdbbd8Cy7.1',usuario:'eiecz11@eie.unse.edu.ar',contrasena:'Canal11eie2026'},
+  {canal_num:'11',sala_num:'3',horario:'08:00-10:00',enlace_zoom:'https://us02web.zoom.us/j/84178238751?pwd=tzNgGMm2hi4kY6eQLKmXW2TqHdJA0f.1',usuario:'eiecz11@eie.unse.edu.ar',contrasena:'Canal11eie2026'},
+  {canal_num:'11',sala_num:'4',horario:'10:00-12:00',enlace_zoom:'https://us02web.zoom.us/j/86982533151?pwd=FPSGUED5bI4DxlGj1CjzlwT4bMVsw4.1',usuario:'eiecz11@eie.unse.edu.ar',contrasena:'Canal11eie2026'},
+  {canal_num:'12',sala_num:'1',horario:'18:00-20:00',enlace_zoom:'https://us02web.zoom.us/j/81960089733?pwd=Mbb1A8LaiZ7KkPss88krc9aKpLNyBQ.1',usuario:'eiecz12@eie.unse.edu.ar',contrasena:'Canal12eie2026'},
+  {canal_num:'12',sala_num:'2',horario:'20:00-22:00',enlace_zoom:'https://us02web.zoom.us/j/81701296201?pwd=LkmFIp6yDMLq2AhMzR3RSF3HhyBHZD.1',usuario:'eiecz12@eie.unse.edu.ar',contrasena:'Canal12eie2026'},
+  {canal_num:'12',sala_num:'3',horario:'08:00-10:00',enlace_zoom:'https://us02web.zoom.us/j/82158427431?pwd=irVIlBbaTj1Oej5TcASlwdn1aKrug8.1',usuario:'eiecz12@eie.unse.edu.ar',contrasena:'Canal12eie2026'},
+  {canal_num:'12',sala_num:'4',horario:'10:00-12:00',enlace_zoom:'https://us02web.zoom.us/j/81017566477?pwd=6AGPqJO7qzAK4EVW8ZrlUqaLe12yOB.1',usuario:'eiecz12@eie.unse.edu.ar',contrasena:'Canal12eie2026'},
+  {canal_num:'13',sala_num:'1',horario:'18:00-20:00',enlace_zoom:'https://us02web.zoom.us/j/85898473768?pwd=kJcLOuqu6dfBRbQJh2zyi2DIazaEzF.1',usuario:'eiecz13@eie.unse.edu.ar',contrasena:'Canal13eie2026'},
+  {canal_num:'13',sala_num:'2',horario:'20:00-22:00',enlace_zoom:'https://us02web.zoom.us/j/85976437550?pwd=GKItMUfAYc09BHkr2zfKLfTqjInILe.1',usuario:'eiecz13@eie.unse.edu.ar',contrasena:'Canal13eie2026'},
+  {canal_num:'13',sala_num:'3',horario:'08:00-10:00',enlace_zoom:'https://us02web.zoom.us/j/85612174703?pwd=xnTwj0QxdGJkoKOILeITwMvon1QGuy.1',usuario:'eiecz13@eie.unse.edu.ar',contrasena:'Canal13eie2026'},
+  {canal_num:'13',sala_num:'4',horario:'10:00-12:00',enlace_zoom:'https://us02web.zoom.us/j/84140825105?pwd=xLHv7zm6h1Fj3BnfGzr8Dtvpzxqbbr.1',usuario:'eiecz13@eie.unse.edu.ar',contrasena:'Canal13eie2026'},
+  {canal_num:'14',sala_num:'1',horario:'18:00-20:00',enlace_zoom:'https://us02web.zoom.us/j/87524625509?pwd=DaUyYVRjlJI4BNFctEHzngl3P59lcK.1',usuario:'eiecz14@eie.unse.edu.ar',contrasena:'Canal14eie2026'},
+  {canal_num:'14',sala_num:'2',horario:'20:00-22:00',enlace_zoom:'https://us02web.zoom.us/j/83489828241?pwd=EqNMOSbhTBA51CvoYMCZi8JSOFL339.1',usuario:'eiecz14@eie.unse.edu.ar',contrasena:'Canal14eie2026'},
+  {canal_num:'14',sala_num:'3',horario:'08:00-10:00',enlace_zoom:'https://us02web.zoom.us/j/89458114073?pwd=cvHQZdoXKOHc06wEkqvumyssRZvGZV.1',usuario:'eiecz14@eie.unse.edu.ar',contrasena:'Canal14eie2026'},
+  {canal_num:'14',sala_num:'4',horario:'10:00-12:00',enlace_zoom:'https://us02web.zoom.us/j/89393015459?pwd=mRJQGbLiLFAbhFjto9koXKDB8TG1Sa.1',usuario:'eiecz14@eie.unse.edu.ar',contrasena:'Canal14eie2026'},
+  {canal_num:'15',sala_num:'1',horario:'18:00-20:00',enlace_zoom:'https://us02web.zoom.us/j/87102129674?pwd=LAF7zbL4tipBnNELbwmKLgjYTksVIv.1',usuario:'eiecz15@eie.unse.edu.ar',contrasena:'Canal15eie2026'},
+  {canal_num:'15',sala_num:'2',horario:'20:00-22:00',enlace_zoom:'https://us02web.zoom.us/j/82076940176?pwd=drEcbNt4raWlP5ZaYj3b1JxI96p3zR.1',usuario:'eiecz15@eie.unse.edu.ar',contrasena:'Canal15eie2026'},
+  {canal_num:'15',sala_num:'3',horario:'08:00-10:00',enlace_zoom:'https://us02web.zoom.us/j/89791072046?pwd=VZr7BT9Zh8hbUGf3pYjeuHiuwHCkAa.1',usuario:'eiecz15@eie.unse.edu.ar',contrasena:'Canal15eie2026'},
+  {canal_num:'15',sala_num:'4',horario:'10:00-12:00',enlace_zoom:'https://us02web.zoom.us/j/86081247238?pwd=WQW20C4kH9nxTcva3ATnBfJbQTyBsX.1',usuario:'eiecz15@eie.unse.edu.ar',contrasena:'Canal15eie2026'},
+  {canal_num:'16',sala_num:'1',horario:'18:00-20:00',enlace_zoom:'https://us02web.zoom.us/j/87981937118?pwd=2Uyk8acVQJRbn7apuramF9fiSxFYas.1',usuario:'eiecz16@eie.unse.edu.ar',contrasena:'Canal16eie2026'},
+  {canal_num:'16',sala_num:'2',horario:'20:00-22:00',enlace_zoom:'https://us02web.zoom.us/j/83597625636?pwd=jWMxfB64KR9zMC3cv4RrhFliqp6tCX.1',usuario:'eiecz16@eie.unse.edu.ar',contrasena:'Canal16eie2026'},
+  {canal_num:'16',sala_num:'3',horario:'08:00-10:00',enlace_zoom:'https://us02web.zoom.us/j/83318727870?pwd=PRAUaYfhgd5kGGIJk98B1Bv0eHrC0B.1',usuario:'eiecz16@eie.unse.edu.ar',contrasena:'Canal16eie2026'},
+  {canal_num:'16',sala_num:'4',horario:'10:00-12:00',enlace_zoom:'https://us02web.zoom.us/j/87628349283?pwd=SifsyDM0Taio7aaKEUViBQDi9wsSER.1',usuario:'eiecz16@eie.unse.edu.ar',contrasena:'Canal16eie2026'},
+  {canal_num:'17',sala_num:'1',horario:'18:00-20:00',enlace_zoom:'https://us02web.zoom.us/j/84748967989?pwd=VMonMerhITPTWfxTmSyMyHkWXZ1KVb.1',usuario:'eiecz17@eie.unse.edu.ar',contrasena:'Canal17eie2026'},
+  {canal_num:'17',sala_num:'2',horario:'20:00-22:00',enlace_zoom:'https://us02web.zoom.us/j/88052302776?pwd=5RBMKFbic8llbh9oDuSxHpOADVYkv4.1',usuario:'eiecz17@eie.unse.edu.ar',contrasena:'Canal17eie2026'},
+  {canal_num:'17',sala_num:'3',horario:'08:00-10:00',enlace_zoom:'https://us02web.zoom.us/j/81812776101?pwd=c6aUYjUyo7alxlMxrJSZs8LmA3bvDl.1',usuario:'eiecz17@eie.unse.edu.ar',contrasena:'Canal17eie2026'},
+  {canal_num:'17',sala_num:'4',horario:'10:00-12:00',enlace_zoom:'https://us02web.zoom.us/j/87189778760?pwd=bZALyn7N42FEphYDDaTPYUObdJEyIX.1',usuario:'eiecz17@eie.unse.edu.ar',contrasena:'Canal17eie2026'},
+  {canal_num:'21',sala_num:'1',horario:'18:00-20:00',enlace_zoom:'https://us02web.zoom.us/j/89338753095?pwd=gZPQuNGxLKbXKZwDbDEBVVSQBMVIg7.1',usuario:'eiecz21@eie.unse.edu.ar',contrasena:'Canal21eie2026'},
+  {canal_num:'21',sala_num:'2',horario:'20:00-22:00',enlace_zoom:'https://us02web.zoom.us/j/89197025805?pwd=xMxnRoje8kUvHE9pecROWSaftydCCK.1',usuario:'eiecz21@eie.unse.edu.ar',contrasena:'Canal21eie2026'},
+  {canal_num:'21',sala_num:'3',horario:'08:00-10:00',enlace_zoom:'https://us02web.zoom.us/j/83573595780?pwd=L8bzyz1TGfaRayuTOIibpyfby1TOjk.1',usuario:'eiecz21@eie.unse.edu.ar',contrasena:'Canal21eie2026'},
+  {canal_num:'21',sala_num:'4',horario:'10:00-12:00',enlace_zoom:'https://us02web.zoom.us/j/83870694845?pwd=ZvlitrROKbJxfYSgwZFgH73hkipWRN.1',usuario:'eiecz21@eie.unse.edu.ar',contrasena:'Canal21eie2026'},
+  {canal_num:'22',sala_num:'1',horario:'18:00-20:00',enlace_zoom:'https://us02web.zoom.us/j/82657470434?pwd=47tIL6KbUcQh0dkbBtZ848wqFVPJqh.1',usuario:'eiecz22@eie.unse.edu.ar',contrasena:'Canal22eie2026'},
+  {canal_num:'22',sala_num:'2',horario:'20:00-22:00',enlace_zoom:'https://us02web.zoom.us/j/81474122336?pwd=BKbvjZc3GaEjGbs8aEK3lmMfK9BNx4.1',usuario:'eiecz22@eie.unse.edu.ar',contrasena:'Canal22eie2026'},
+  {canal_num:'22',sala_num:'3',horario:'08:00-10:00',enlace_zoom:'https://us02web.zoom.us/j/84444814826?pwd=6tBKv49Az2Id4cybKZMBJFMAyObAAH.1',usuario:'eiecz22@eie.unse.edu.ar',contrasena:'Canal22eie2026'},
+  {canal_num:'22',sala_num:'4',horario:'10:00-12:00',enlace_zoom:'https://us02web.zoom.us/j/85125141200?pwd=ZdTlyUSaznKS3rofjRGtJJT3pdJiD3.1',usuario:'eiecz22@eie.unse.edu.ar',contrasena:'Canal22eie2026'},
+  {canal_num:'23',sala_num:'1',horario:'18:00-20:00',enlace_zoom:'https://us02web.zoom.us/j/87403242837?pwd=yLkEpRTodHtmoMBtOqOo1S4sdMNd6Q.1',usuario:'eiecz23@eie.unse.edu.ar',contrasena:'Canal23eie2026'},
+  {canal_num:'23',sala_num:'2',horario:'20:00-22:00',enlace_zoom:'https://us02web.zoom.us/j/82314557746?pwd=kIXYw8ml9ecax9vuhznfq3pwz2Bsce.1',usuario:'eiecz23@eie.unse.edu.ar',contrasena:'Canal23eie2026'},
+  {canal_num:'23',sala_num:'3',horario:'08:00-10:00',enlace_zoom:'https://us02web.zoom.us/j/83828754172?pwd=SWRdxABXvV6By6bZQ4Tp8uMpaYiVz6.1',usuario:'eiecz23@eie.unse.edu.ar',contrasena:'Canal23eie2026'},
+  {canal_num:'23',sala_num:'4',horario:'10:00-12:00',enlace_zoom:'https://us02web.zoom.us/j/86792917810?pwd=eDRRMYVpbbFxYpU5htgtPD6iGu787a.1',usuario:'eiecz23@eie.unse.edu.ar',contrasena:'Canal23eie2026'},
+  {canal_num:'24',sala_num:'1',horario:'18:00-20:00',enlace_zoom:'https://us02web.zoom.us/j/89704079423?pwd=T8x7ZLdP4xUvUTuKZRrCyFsDzmtNfD.1',usuario:'eiecz24@eie.unse.edu.ar',contrasena:'Canal24eie2026'},
+  {canal_num:'24',sala_num:'2',horario:'20:00-22:00',enlace_zoom:'https://us02web.zoom.us/j/81125699041?pwd=VkPJge4KgN9Av67aoKiPGJXtAhzQdF.1',usuario:'eiecz24@eie.unse.edu.ar',contrasena:'Canal24eie2026'},
+  {canal_num:'24',sala_num:'3',horario:'08:00-10:00',enlace_zoom:'https://us02web.zoom.us/j/86230770066?pwd=zhahCnGgIFGYaYtYf7djXbTZxI9Hz4.1',usuario:'eiecz24@eie.unse.edu.ar',contrasena:'Canal24eie2026'},
+  {canal_num:'24',sala_num:'4',horario:'10:00-12:00',enlace_zoom:'https://us02web.zoom.us/j/87631405436?pwd=EbMesjpJaO943rEARVrPTRdjvMuR6c.1',usuario:'eiecz24@eie.unse.edu.ar',contrasena:'Canal24eie2026'},
+  {canal_num:'25',sala_num:'1',horario:'18:00-20:00',enlace_zoom:'https://us02web.zoom.us/j/84332712281?pwd=yDt7XJGf0aJPqrL91xazt8HamNazIY.1',usuario:'eiecz25@eie.unse.edu.ar',contrasena:'Canal25eie2026'},
+  {canal_num:'25',sala_num:'2',horario:'20:00-22:00',enlace_zoom:'https://us02web.zoom.us/j/89494804233?pwd=lFWnHvAGqP5PI4NxdfIamOA6yBG7sv.1',usuario:'eiecz25@eie.unse.edu.ar',contrasena:'Canal25eie2026'},
+  {canal_num:'25',sala_num:'3',horario:'08:00-10:00',enlace_zoom:'https://us02web.zoom.us/j/87025232575?pwd=XfiuzIRHjQOs5rQaWbo7gShq6bcf5c.1',usuario:'eiecz25@eie.unse.edu.ar',contrasena:'Canal25eie2026'},
+  {canal_num:'25',sala_num:'4',horario:'10:00-12:00',enlace_zoom:'https://us02web.zoom.us/j/89826228878?pwd=wrZmJvsZZ8TjPVpMV832QuZJJYYbSB.1',usuario:'eiecz25@eie.unse.edu.ar',contrasena:'Canal25eie2026'},
+  {canal_num:'26',sala_num:'1',horario:'18:00-20:00',enlace_zoom:'https://us02web.zoom.us/j/85186401684?pwd=GEjYTs9WLtsMNkzQk8Z6dfEMrbRVey.1',usuario:'eiecz26@eie.unse.edu.ar',contrasena:'Canal26eie2026'},
+  {canal_num:'26',sala_num:'2',horario:'20:00-22:00',enlace_zoom:'https://us02web.zoom.us/j/88951710626?pwd=71ifplZw6Etn9QCBO7BEYR9a98HO19.1',usuario:'eiecz26@eie.unse.edu.ar',contrasena:'Canal26eie2026'},
+  {canal_num:'26',sala_num:'3',horario:'08:00-10:00',enlace_zoom:'https://us02web.zoom.us/j/83174936613?pwd=LHxYvZQRPyklkLGvBi5H0y5sE0JdoV.1',usuario:'eiecz26@eie.unse.edu.ar',contrasena:'Canal26eie2026'},
+  {canal_num:'26',sala_num:'4',horario:'10:00-12:00',enlace_zoom:'https://us02web.zoom.us/j/86199168714?pwd=tOUebvDtONZybXKbzZ8yxbQztgjDPo.1',usuario:'eiecz26@eie.unse.edu.ar',contrasena:'Canal26eie2026'},
+  {canal_num:'27',sala_num:'1',horario:'18:00-20:00',enlace_zoom:'https://us02web.zoom.us/j/88510708314?pwd=dHDbuL6WpX3iJN7nOWvvCtmB17s0G8.1',usuario:'eiecz27@eie.unse.edu.ar',contrasena:'Canal27eie2026'},
+  {canal_num:'27',sala_num:'2',horario:'20:00-22:00',enlace_zoom:'https://us02web.zoom.us/j/86144939492?pwd=IvNxm8xJU3GIjaHbshahpelxEJ9WU9.1',usuario:'eiecz27@eie.unse.edu.ar',contrasena:'Canal27eie2026'},
+  {canal_num:'27',sala_num:'3',horario:'08:00-10:00',enlace_zoom:'https://us02web.zoom.us/j/88434082109?pwd=k0dsZRpXzuq4UjIIZVHm4oePrcOEBa.1',usuario:'eiecz27@eie.unse.edu.ar',contrasena:'Canal27eie2026'},
+  {canal_num:'27',sala_num:'4',horario:'10:00-12:00',enlace_zoom:'https://us02web.zoom.us/j/85050664389?pwd=EFjGWZPMrDIaTupRcGp1Np1WeWbfER.1',usuario:'eiecz27@eie.unse.edu.ar',contrasena:'Canal27eie2026'},
+  {canal_num:'28',sala_num:'1',horario:'18:00-20:00',enlace_zoom:'https://us02web.zoom.us/j/81419278533?pwd=jDvBMv6nmvuGPALKVxQvCD0MyBf16j.1',usuario:'eiecz28@eie.unse.edu.ar',contrasena:'Canal28eie2026'},
+  {canal_num:'28',sala_num:'2',horario:'20:00-22:00',enlace_zoom:'https://us02web.zoom.us/j/85182857049?pwd=rkc48WNDn2EvWWhAdBfbjHDFal5Z3W.1',usuario:'eiecz28@eie.unse.edu.ar',contrasena:'Canal28eie2026'},
+  {canal_num:'28',sala_num:'3',horario:'08:00-10:00',enlace_zoom:'https://us02web.zoom.us/j/82934808661?pwd=TeyAZHQIW8pVfDkNNq5cQyDaObKTNZ.1',usuario:'eiecz28@eie.unse.edu.ar',contrasena:'Canal28eie2026'},
+  {canal_num:'28',sala_num:'4',horario:'10:00-12:00',enlace_zoom:'https://us02web.zoom.us/j/88937310639?pwd=eUDrYg1Ebupe5Laa87AWDRhuW0UOCH.1',usuario:'eiecz28@eie.unse.edu.ar',contrasena:'Canal28eie2026'},
+  {canal_num:'29',sala_num:'1',horario:'18:00-20:00',enlace_zoom:'https://us02web.zoom.us/j/83876171423?pwd=nrJNK36lk3c0ODXf6BjJlDkbwOAzTz.1',usuario:'eiecz29@eie.unse.edu.ar',contrasena:'Canal29eie2026'},
+  {canal_num:'29',sala_num:'2',horario:'20:00-22:00',enlace_zoom:'https://us02web.zoom.us/j/84904120835?pwd=Z44M2NqYHaWOnAfrJQqOsn9S8czRCT.1',usuario:'eiecz29@eie.unse.edu.ar',contrasena:'Canal29eie2026'},
+  {canal_num:'29',sala_num:'3',horario:'08:00-10:00',enlace_zoom:'https://us02web.zoom.us/j/88380033936?pwd=tXtrF4bPdf2afnEvpUqBoNaci26Mc5.1',usuario:'eiecz29@eie.unse.edu.ar',contrasena:'Canal29eie2026'},
+  {canal_num:'MA',sala_num:'1',horario:'18:00-20:00',enlace_zoom:'https://us02web.zoom.us/j/84152749180?pwd=SXeT4SCoiuvwePYzBkDK6ijvq4ZJ8a.1',usuario:'mesadeayuda@eie.unse.edu.ar',contrasena:'CanalMAeie2026'},
+  {canal_num:'MA',sala_num:'2',horario:'20:00-22:00',enlace_zoom:'https://us02web.zoom.us/j/82185984705?pwd=P6ydBBrXuSDxdLCb0VBe2V9gBjbmXy.1',usuario:'mesadeayuda@eie.unse.edu.ar',contrasena:'CanalMAeie2026'},
+  {canal_num:'MA',sala_num:'3',horario:'08:00-10:00',enlace_zoom:'https://us02web.zoom.us/j/83694486218?pwd=UudnUmTjsmwtpcHFbOSG6yjwHsLADa.1',usuario:'mesadeayuda@eie.unse.edu.ar',contrasena:'CanalMAeie2026'},
+];
+
+// ── INIT ──
+window.onload=()=>{
+  loadLocal();
+  if(APP.scriptUrl) document.getElementById('configUrl').value=APP.scriptUrl;
+  renderAll();
+  if(!APP.scriptUrl) document.getElementById('urlSetupBanner').style.display='flex';
+  syncData();
+};
+
+function loadLocal(){
+  try{
+    const a=localStorage.getItem('eie_asignaciones');
+    const d=localStorage.getItem('eie_docentes');
+    if(a) APP.asignaciones=JSON.parse(a);
+    if(d) APP.docentes=JSON.parse(d);
+  }catch(e){}
+}
+function saveLocal(){
+  localStorage.setItem('eie_asignaciones',JSON.stringify(APP.asignaciones));
+  localStorage.setItem('eie_docentes',JSON.stringify(APP.docentes));
+}
+
+// ── API ──
+async function apiGet(sheet){
+  if(!APP.scriptUrl) return null;
+  try{
+    // Apps Script necesita redirect follow para CORS
+    const url=`${APP.scriptUrl}?action=list&sheet=${sheet}&t=${Date.now()}`;
+    const r=await fetch(url,{method:'GET',redirect:'follow'});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const text=await r.text();
+    const j=JSON.parse(text);
+    if(!j.ok) throw new Error(j.data||'Error en el script');
+    return j.data;
+  }catch(e){
+    console.error('apiGet('+sheet+') error:',e.message);
+    throw e;
+  }
+}
+async function apiPost(action,sheet,data,id){
+  if(!APP.scriptUrl) return null;
+  try{
+    const r=await fetch(APP.scriptUrl,{
+      method:'POST',
+      redirect:'follow',
+      headers:{'Content-Type':'text/plain'}, // Apps Script acepta text/plain sin preflight
+      body:JSON.stringify({action,sheet,data,id})
+    });
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return await r.json();
+  }catch(e){
+    console.error('apiPost error:',e.message);
+    return null;
+  }
+}
+async function syncData(){
+  if(!APP.scriptUrl){
+    setSyncStatus('err','Sin URL configurada — ir a ⚙ Configuración');
+    return;
+  }
+  setSyncStatus('loading','Sincronizando…');
+  try{
+    const[asigs,docs]=await Promise.all([
+      apiGet('asignaciones').catch(()=>null),
+      apiGet('docentes').catch(()=>null)
+    ]);
+    let cambios=[];
+    if(asigs&&asigs.length>=0){ APP.asignaciones=asigs; cambios.push(asigs.length+' asignaciones'); }
+    if(docs&&docs.length>=0){   APP.docentes=docs;       cambios.push(docs.length+' docentes'); }
+    saveLocal(); renderAll();
+    if(cambios.length>0){
+      setSyncStatus('ok','Sincronizado '+new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})+' · '+cambios.join(' · '));
+    } else {
+      setSyncStatus('err','Sheet respondió pero sin datos — verificá la URL o ejecutá setup_inicial()');
+    }
+  }catch(e){
+    console.error('syncData error:',e);
+    setSyncStatus('err','Error: '+e.message);
+  }
+}
+function setSyncStatus(s,m){document.getElementById('syncDot').className='sync-dot '+s;document.getElementById('syncText').textContent=m;}
+
+// ── VIEWS ──
+function showView(id,navEl){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(navEl) navEl.classList.add('active');
+  const titles={dashboard:'Dashboard',grilla:'Grilla horaria',docentes:'Asignaciones por docente',nuevo:'Nueva asignación',abm:'Base de docentes',mensajes:'Centro de notificaciones',config:'Configuración'};
+  document.getElementById('topbarTitle').textContent=titles[id]||id;
+  if(id==='nuevo') renderFormDropdowns();
+  if(id==='mensajes') renderMensajesView();
+  if(id==='grilla') renderGrilla();
+  if(id==='docentes') renderTable();
+  if(id==='abm') renderABM();
+}
+
+// ── RENDER ALL ──
+function renderAll(){
+  renderStats();renderCanalGrid();renderTable();renderFormDropdowns();renderABM();
+  document.getElementById('navCount').textContent=APP.asignaciones.length;
+  document.getElementById('navDocCount').textContent=APP.docentes.length;
+}
+
+// ── STATS ──
+function renderStats(){
+  const uniqueCanales=[...new Set(CANALES_BASE.map(c=>c.canal_num).filter(n=>n!=='MA'))].length;
+  const asigs=APP.asignaciones.filter(a=>a.estado==='activo'||!a.estado).length;
+  document.getElementById('statCanales').textContent=uniqueCanales;
+  document.getElementById('statAsignadas').textContent=asigs;
+  document.getElementById('statDocentes').textContent=APP.docentes.length;
+  document.getElementById('statLibres').textContent=Math.max(0,uniqueCanales*4-asigs);
+}
+
+// ── CANAL MAP ──
+function renderCanalGrid(){
+  const grid=document.getElementById('canalGrid');
+  const nums=[...new Set(CANALES_BASE.map(c=>c.canal_num))];
+  grid.innerHTML=nums.map(cn=>{
+    const salas=[1,2,3,4].map(s=>{
+      const asig=APP.asignaciones.find(a=>String(a.canal)===String(cn)&&String(a.sala)===String(s)&&(a.estado==='activo'||!a.estado));
+      return `<div class="sala-dot ${asig?'sd'+s:'sd-libre'}" title="${asig?asig.docente:'Libre'}" onclick="event.stopPropagation();openCanalModal('${cn}')">${asig?'S'+s:'—'}</div>`;
+    }).join('');
+    return `<div class="canal-tile" onclick="openCanalModal('${cn}')"><div class="ct-num">Canal ${cn}</div><div class="ct-salas">${salas}</div></div>`;
+  }).join('');
+}
+
+// ── MODAL CANAL ──
+function openCanalModal(cn){
+  const canSalas=CANALES_BASE.filter(c=>String(c.canal_num)===String(cn));
+  const u=canSalas[0]?.usuario||'';const p=canSalas[0]?.contrasena||'';
+  document.getElementById('modalCanalTitle').textContent=`Canal ${cn}`;
+  let html=`<div class="modal-canal-info">
+    <div class="mci-item"><div class="mci-label">Usuario Zoom</div><div class="mci-val">${u}</div></div>
+    <div class="mci-item"><div class="mci-label">Contraseña</div><div class="mci-val">${p}</div></div>
+  </div><div class="modal-sala-grid">`;
+  [1,2,3,4].forEach(s=>{
+    const info=canSalas.find(c=>String(c.sala_num)===String(s));
+    const asig=APP.asignaciones.find(a=>String(a.canal)===String(cn)&&String(a.sala)===String(s)&&(a.estado==='activo'||!a.estado));
+    const link=info?.enlace_zoom||'';
+    html+=`<div class="sala-card" style="border-color:${asig?SALA_COLORS[s]:'var(--border)'}">
+      <div class="sc-header"><div class="sc-badge" style="background:${SALA_COLORS[s]}">S${s}</div><div class="sc-hora">${SALA_LABELS[s]}</div></div>`;
+    if(asig){
+      html+=`<div class="sc-docente">${asig.docente||'—'}</div><div class="sc-materia">${asig.materia||''} · ${asig.carrera||''} ${asig.cohorte||''}</div>
+      <div style="margin-top:8px;display:flex;gap:5px;flex-wrap:wrap">
+        ${link?`<a href="${link}" target="_blank" class="btn btn-primary btn-sm">🔗 Zoom</a>`:''}
+        ${link?`<button class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText('${link}');showToast('Link copiado','success')">📋</button>`:''}
+        ${asig.telefono?`<button class="btn btn-wa btn-sm" onclick="notifWAFromModal(${JSON.stringify(asig).replace(/"/g,'&quot;')})">WA</button>`:''}
+        ${asig.email?`<button class="btn btn-horde btn-sm" onclick="notifHordeFromModal(${JSON.stringify(asig).replace(/"/g,'&quot;')})">📧</button>`:''}
+        ${asig.email?`<button class="btn btn-moodle btn-sm" onclick="notifMoodleFromModal(${JSON.stringify(asig).replace(/"/g,'&quot;')})">🎓</button>`:''}
+      </div>`;
+    }else{
+      html+=`<div class="sc-free">🟢 Sala libre</div>${link?`<div style="font-size:10px;color:var(--muted);margin-top:4px;word-break:break-all">${link}</div>`:''}`;
+    }
+    html+=`</div>`;
+  });
+  html+=`</div>`;
+  document.getElementById('modalCanalBody').innerHTML=html;
+  document.getElementById('modalCanal').classList.add('open');
+}
+
+function notifWAFromModal(a){closeModal('modalCanal');setTimeout(()=>window.open(buildWALink(a),'_blank'),100);}
+function notifHordeFromModal(a){closeModal('modalCanal');setTimeout(()=>openHordeWithAsig(a),100);}
+function notifMoodleFromModal(a){closeModal('modalCanal');setTimeout(()=>openMoodleWithAsig(a),100);}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+
+// ── TABLA ASIGNACIONES ──
+function renderTable(){
+  const tbody=document.getElementById('asigTableBody');
+  const filtered=getFiltered();
+  document.getElementById('tableEmpty').style.display=filtered.length?'none':'block';
+  if(!filtered.length){tbody.innerHTML='';return;}
+  tbody.innerHTML=filtered.map(a=>{
+    const link=getLinkForAsig(a);
+    const bg=SALA_COLORS[a.sala]||'#aaa';
+    const hasTel=!!a.telefono;const hasEmail=!!a.email;
+    return `<tr>
+      <td><strong>${a.docente||'—'}</strong></td>
+      <td>${a.materia||'—'}</td>
+      <td><span class="badge ${CARRERA_COLOR[a.carrera]||'b-blue'}">${a.carrera||'—'} ${a.cohorte||''}</span></td>
+      <td><span class="sala-tag" style="background:${bg}">C${a.canal}·S${a.sala}</span></td>
+      <td style="font-size:12px">${SALA_LABELS[a.sala]||''}</td>
+      <td style="font-size:11px;white-space:nowrap">${fmt(a.fecha_inicio)}→${fmt(a.fecha_fin)}</td>
+      <td><span class="badge ${a.estado==='activo'||!a.estado?'b-green':'b-red'}">${a.estado||'activo'}</span></td>
+      <td><div class="row-actions">
+        ${hasTel?`<button class="btn btn-wa btn-sm" title="WhatsApp" onclick="notifWARow('${a.id}')">WA</button>`:''}
+        ${hasEmail?`<button class="btn btn-horde btn-sm" title="Correo Horde" onclick="notifHordeRow('${a.id}')">📧</button>`:''}
+        ${hasEmail?`<button class="btn btn-moodle btn-sm" title="Moodle" onclick="notifMoodleRow('${a.id}')">🎓</button>`:''}
+      </div></td>
+      <td><div class="row-actions">
+        ${link?`<a href="${link}" target="_blank" class="btn btn-primary btn-sm">🔗</a>`:''}
+        ${link?`<button class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText('${link}');showToast('Copiado','success')">📋</button>`:''}
+        <button class="btn btn-ghost btn-sm" onclick="editAsig('${a.id}')">✏️</button>
+        <button class="btn btn-red btn-sm" onclick="confirmDel('${a.id}','asig')">🗑</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+function getFiltered(){
+  const q=(document.getElementById('searchInput')?.value||'').toLowerCase();
+  const car=document.getElementById('filterCarrera')?.value||'';
+  const sala=document.getElementById('filterSala')?.value||'';
+  const est=document.getElementById('filterEstado')?.value||'';
+  return APP.asignaciones.filter(a=>
+    (!q||(a.docente||'').toLowerCase().includes(q)||(a.materia||'').toLowerCase().includes(q))&&
+    (!car||a.carrera===car)&&(!sala||String(a.sala)===sala)&&(!est||(a.estado||'activo')===est));
+}
+function filterTable(){renderTable();}
+
+// Notif desde tabla
+function notifWARow(id){const a=APP.asignaciones.find(x=>x.id===id);if(a)window.open(buildWALink(a),'_blank');}
+function notifHordeRow(id){const a=APP.asignaciones.find(x=>x.id===id);if(a)openHordeWithAsig(a);}
+function notifMoodleRow(id){const a=APP.asignaciones.find(x=>x.id===id);if(a)openMoodleWithAsig(a);}
+
+// ── GRILLA ──
+function renderGrilla(){
+  const container=document.getElementById('grillaContent');
+  const headerHTML=`<div class="gh gh-label">Canal</div><div class="gh">Sala 1 · 18-20h</div><div class="gh">Sala 2 · 20-22h</div><div class="gh">Sala 3 · 08-10h</div><div class="gh">Sala 4 · 10-12h</div>`;
+  container.innerHTML=headerHTML;
+  const nums=[...new Set(CANALES_BASE.map(c=>c.canal_num))];
+  nums.forEach(cn=>{
+    const cDiv=document.createElement('div');
+    cDiv.className='gcell gc-canal';cDiv.textContent=cn==='MA'?'Mesa Ayuda':`Canal ${cn}`;
+    container.appendChild(cDiv);
+    [1,2,3,4].forEach(s=>{
+      const asig=APP.asignaciones.find(a=>String(a.canal)===String(cn)&&String(a.sala)===String(s)&&(a.estado==='activo'||!a.estado));
+      const cell=document.createElement('div');
+      if(asig){
+        cell.className='gcell gc-used';cell.title=asig.docente+'\n'+asig.materia;cell.onclick=()=>openCanalModal(cn);
+        cell.innerHTML=`<div class="gc-name" style="color:${SALA_COLORS[s]}">${asig.docente||'—'}</div><div class="gc-mat">${asig.materia||''}</div>`;
+      }else{cell.className='gcell gc-libre';cell.textContent='Libre';}
+      container.appendChild(cell);
+    });
+  });
+}
+
+// ── ABM DOCENTES ──
+function renderABM(){
+  const q=(document.getElementById('abmSearch')?.value||'').toLowerCase();
+  const filtered=APP.docentes.filter(d=>
+    (!q||(d.apellido||'').toLowerCase().includes(q)||(d.nombre||'').toLowerCase().includes(q)));
+  const grid=document.getElementById('abmGrid');
+  document.getElementById('abmEmpty').style.display=filtered.length?'none':'block';
+  grid.innerHTML=filtered.map(d=>`
+    <div class="docente-card">
+      <div class="dc-name">${d.apellido||''}, ${d.nombre||''}</div>
+      <div class="dc-info">
+        <span>📱 ${d.telefono||'<em style="color:#aaa">Sin teléfono</em>'}</span>
+        <span>✉ ${d.email||'<em style="color:#aaa">Sin email</em>'}</span>
+      </div>
+      <div class="dc-actions">
+        ${d.telefono?`<a href="https://wa.me/${(d.telefono||'').replace(/\D/g,'')}" target="_blank" class="btn btn-wa btn-sm">WA</a>`:''}
+        ${d.email?`<button class="btn btn-horde btn-sm" onclick="openHordeDirect('${d.email}')">📧</button>`:''}
+        <button class="btn btn-ghost btn-sm" onclick="openEditDocente('${d.id}')">✏️ Editar</button>
+        <button class="btn btn-red btn-sm" onclick="confirmDel('${d.id}','docente')">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+// ── NUEVO DOCENTE MODAL ──
+function openModalNuevoDocente(){
+  ['nd_apellido','nd_nombre','nd_tel','nd_email'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('modalNuevoDocente').classList.add('open');
+  setTimeout(()=>document.getElementById('nd_apellido').focus(),200);
+}
+async function guardarNuevoDocente(){
+  const apellido=document.getElementById('nd_apellido').value.trim();
+  const nombre=document.getElementById('nd_nombre').value.trim();
+  if(!apellido||!nombre){showToast('Apellido y nombre son obligatorios','error');return;}
+  const id='DOC_'+Date.now();
+  const doc={id,apellido,nombre,
+    telefono:document.getElementById('nd_tel').value.trim(),
+    email:document.getElementById('nd_email').value.trim(),
+    activo:'SI'};
+  APP.docentes.push(doc);
+  saveLocal();renderAll();
+  await apiPost('create','docentes',doc);
+  closeModal('modalNuevoDocente');
+  showToast(`Docente ${apellido}, ${nombre} dado de alta ✓`,'success');
+  // Auto-seleccionar en formulario si estamos en vista nuevo
+  const fDocente=document.getElementById('f_docente');
+  if(fDocente){
+    renderFormDropdowns();
+    setTimeout(()=>{
+      const opt=[...fDocente.options].find(o=>o.value===`${apellido}, ${nombre}`);
+      if(opt){fDocente.value=opt.value;onDocenteSelect();}
+    },100);
+  }
+}
+
+// ── EDITAR DOCENTE ──
+function openEditDocente(id){
+  const d=APP.docentes.find(x=>x.id===id);if(!d)return;
+  document.getElementById('ed_id').value=id;
+  document.getElementById('ed_apellido').value=d.apellido||'';
+  document.getElementById('ed_nombre').value=d.nombre||'';
+  document.getElementById('ed_tel').value=d.telefono||'';
+  document.getElementById('ed_email').value=d.email||'';
+
+  document.getElementById('modalEditDocente').classList.add('open');
+}
+async function actualizarDocente(){
+  const id=document.getElementById('ed_id').value;
+  const idx=APP.docentes.findIndex(d=>d.id===id);if(idx<0)return;
+  const updated={...APP.docentes[idx],
+    apellido:document.getElementById('ed_apellido').value.trim(),
+    nombre:document.getElementById('ed_nombre').value.trim(),
+    telefono:document.getElementById('ed_tel').value.trim(),
+    email:document.getElementById('ed_email').value.trim()};
+  APP.docentes[idx]=updated;
+  saveLocal();renderAll();
+  await apiPost('update','docentes',updated,id);
+  closeModal('modalEditDocente');
+  showToast('Docente actualizado ✓','success');
+}
+
+// ── FORM DROPDOWNS ──
+function renderFormDropdowns(){
+  const sel=document.getElementById('f_docente');
+  const prev=sel.value;
+  sel.innerHTML='<option value="">— Seleccionar docente de la BD —</option>'+
+    [...APP.docentes].sort((a,b)=>(a.apellido||'').localeCompare(b.apellido||''))
+    .map(d=>`<option value="${d.apellido}, ${d.nombre}" data-id="${d.id}" data-tel="${d.telefono||''}" data-email="${d.email||''}">${d.apellido}, ${d.nombre}${d.telefono?' 📱':' ⚠️ sin tel'}${d.email?' ✉':' ⚠️ sin email'}</option>`).join('');
+  if(prev) sel.value=prev;
+  const selCan=document.getElementById('f_canal');
+  const prevC=selCan.value;
+  const nums=[...new Set(CANALES_BASE.map(c=>c.canal_num))];
+  selCan.innerHTML='<option value="">— Seleccionar canal —</option>'+nums.map(n=>`<option value="${n}">Canal ${n}</option>`).join('');
+  if(prevC) selCan.value=prevC;
+}
+
+function onDocenteSelect(){
+  const sel=document.getElementById('f_docente');
+  const opt=sel.options[sel.selectedIndex];
+  if(opt&&opt.dataset.tel!==undefined){
+    document.getElementById('f_telefono').value=opt.dataset.tel||'';
+    document.getElementById('f_email').value=opt.dataset.email||'';
+  }
+  updateMsgPreview();
+}
+
+function onCanalChange(){
+  const cn=document.getElementById('f_canal').value;
+  const selSala=document.getElementById('f_sala');
+  selSala.innerHTML='<option value="">— Elegir sala —</option>'+
+    [1,2,3,4].map(s=>{
+      const asig=APP.asignaciones.find(a=>String(a.canal)===cn&&String(a.sala)===String(s)&&(a.estado==='activo'||!a.estado));
+      const libre=!asig||!asig.docente;
+      return `<option value="${s}" ${!libre&&!APP.editMode?'disabled':''}>Sala ${s} · ${SALA_LABELS[s]}${!libre?' ⚠ ocupada':''}</option>`;
+    }).join('');
+  updateLinkPreview();
+}
+function onSalaChange(){updateLinkPreview();updateMsgPreview();}
+
+function updateLinkPreview(){
+  const cn=document.getElementById('f_canal').value;const s=document.getElementById('f_sala').value;
+  const grp=document.getElementById('linkPreviewGroup');
+  if(!cn||!s){grp.style.display='none';return;}
+  const info=CANALES_BASE.find(c=>String(c.canal_num)===cn&&String(c.sala_num)===s);
+  const link=info?.enlace_zoom||'';
+  document.getElementById('f_link_preview').value=link;
+  document.getElementById('f_link_open').href=link;
+  grp.style.display=link?'flex':'none';
+  updateMsgPreview();
+}
+
+function updateMsgPreview(){
+  const docente=document.getElementById('f_docente').value;
+  const materia=document.getElementById('f_materia').value;
+  const cn=document.getElementById('f_canal').value;const s=document.getElementById('f_sala').value;
+  const fi=document.getElementById('f_fecha_inicio').value;const ff=document.getElementById('f_fecha_fin').value;
+  const tel=document.getElementById('f_telefono').value;
+  const email=document.getElementById('f_email').value;
+  const nb=document.getElementById('notifBlock');
+  const mp=document.getElementById('msgPreviewGroup');
+  if(!docente||!materia||!cn||!s){nb.style.display='none';mp.style.display='none';return;}
+  const info=CANALES_BASE.find(c=>String(c.canal_num)===cn&&String(c.sala_num)===s);
+  const msg=generarMensaje({docente,materia,canal:cn,sala:s,
+    horario:SALA_LABELS[s]||'',link:info?.enlace_zoom||'',
+    usuario:info?.usuario||'',contrasena:info?.contrasena||'',
+    fecha_inicio:fi,fecha_fin:ff});
+  APP._currentMsg=msg;APP._currentEmail=email;APP._currentTel=tel;
+  document.getElementById('msgPreview').textContent=msg;
+  mp.style.display='block';nb.style.display='flex';
+  document.getElementById('notifSinTel').style.display=tel?'none':'inline';
+  document.getElementById('notifSinEmail').style.display=email?'none':'inline';
+}
+
+// ── MENSAJE ──
+function generarMensaje(a){
+  const fi=a.fecha_inicio?fmtDate(a.fecha_inicio):'—';const ff=a.fecha_fin?fmtDate(a.fecha_fin):'—';
+  return `Estimado/a Docente,
+
+Le comunicamos que el canal asignado para la clase de *${a.materia}* es:
+
+📹 *Canal ${a.canal} - Sala ${a.sala}*
+🕐 *Horario: ${a.horario||SALA_LABELS[a.sala]||''}*
+📅 Período: ${fi} al ${ff}
+
+🔗 *Enlace de acceso:*
+${a.link||''}
+
+🔐 *Credenciales:*
+Usuario: ${a.usuario||''}
+Contraseña: ${a.contrasena||''}
+
+Ante cualquier inconveniente comuníquese con la Mesa de Ayuda de Plataforma Virtual.
+
+EIE UNSE · Plataforma Virtual 2026`;
+}
+
+// ── NOTIFICACIONES desde formulario ──
+function openWA(){
+  const tel=APP._currentTel;if(!tel){showToast('Sin teléfono registrado','error');return;}
+  window.open(`https://wa.me/${tel.replace(/\D/g,'')}?text=${encodeURIComponent(APP._currentMsg)}`,'_blank');
+}
+function openHorde(){openHordeEmail(APP._currentEmail, APP._currentMsg);}
+function openMoodle(){openMoodleMensaje(APP._currentEmail);}
+function copyMsg(){navigator.clipboard.writeText(APP._currentMsg);showToast('Mensaje copiado ✓','success');}
+function copyLink(){const v=document.getElementById('f_link_preview').value;if(v){navigator.clipboard.writeText(v);showToast('Link copiado ✓','success');}}
+
+// ── HORDE EMAIL ──
+function openHordeEmail(email,msg){
+  if(!email){showToast('Sin email registrado','error');return;}
+  const subject=encodeURIComponent('Asignación Canal Zoom · EIE UNSE');
+  const body=encodeURIComponent(msg);
+  // Abre Horde con compose pre-cargado
+  const url=`https://horde.eie.unse.edu.ar/horde/imp/compose.php?to=${encodeURIComponent(email)}&subject=${subject}&body=${body}`;
+  window.open(url,'_blank');
+  showToast('Abriendo Horde con el mensaje pre-cargado…','success');
+}
+function openHordeDirect(email){window.open(`https://horde.eie.unse.edu.ar/horde/imp/compose.php?to=${encodeURIComponent(email)}`,'_blank');}
+function openHordeWithAsig(a){
+  const info=CANALES_BASE.find(c=>String(c.canal_num)===String(a.canal)&&String(c.sala_num)===String(a.sala));
+  const msg=generarMensaje({...a,link:info?.enlace_zoom||'',usuario:info?.usuario||'',contrasena:info?.contrasena||''});
+  openHordeEmail(a.email,msg);
+}
+
+// ── MOODLE MENSAJERÍA ──
+function openMoodleMensaje(emailOrUser){
+  // Abre la mensajería interna de Moodle
+  window.open('http://sied-eie.unse.edu.ar/message/index.php','_blank');
+  showToast('Abriendo mensajería Moodle. Buscá al docente ahí.','success');
+}
+function openMoodleWithAsig(a){openMoodleMensaje(a.email);}
+
+// ── NOTIF desde tabla/modal con asignación ──
+function buildWALink(a){
+  if(!a.telefono)return'';
+  const info=CANALES_BASE.find(c=>String(c.canal_num)===String(a.canal)&&String(c.sala_num)===String(a.sala));
+  const msg=generarMensaje({...a,link:info?.enlace_zoom||a.enlace_zoom||'',usuario:info?.usuario||a.usuario||'',contrasena:info?.contrasena||a.contrasena||''});
+  return `https://wa.me/${a.telefono.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`;
+}
+
+// ── CENTRO MENSAJES ──
+function renderMensajesView(){
+  const sel=document.getElementById('msg_docente');
+  sel.innerHTML='<option value="">— Seleccionar —</option>'+
+    [...new Set(APP.asignaciones.map(a=>a.docente).filter(Boolean))].sort()
+    .map(d=>`<option value="${d}">${d}</option>`).join('');
+  renderMasivoTable();
+}
+function onMsgDocenteChange(){
+  const doc=document.getElementById('msg_docente').value;
+  const asigs=APP.asignaciones.filter(a=>a.docente===doc);
+  const docData=APP.docentes.find(d=>`${d.apellido}, ${d.nombre}`===doc)||{};
+  document.getElementById('msg_tel').value=asigs[0]?.telefono||docData.telefono||'';
+  document.getElementById('msg_email').value=asigs[0]?.email||docData.email||'';
+  const selAsig=document.getElementById('msg_asig');
+  selAsig.innerHTML='<option value="">— Seleccionar asignación —</option>'+
+    asigs.map((a,i)=>`<option value="${i}">${a.materia} · Canal ${a.canal} S${a.sala}</option>`).join('');
+  document.getElementById('msgCentroPreview').style.display='none';
+  window._msgAsigs=asigs;
+}
+function onMsgAsigChange(){
+  const idx=document.getElementById('msg_asig').value;if(idx==='')return;
+  const a=window._msgAsigs[parseInt(idx)];
+  const tel=document.getElementById('msg_tel').value;
+  const email=document.getElementById('msg_email').value;
+  const info=CANALES_BASE.find(c=>String(c.canal_num)===String(a.canal)&&String(c.sala_num)===String(a.sala));
+  const msg=generarMensaje({...a,link:info?.enlace_zoom||'',usuario:info?.usuario||'',contrasena:info?.contrasena||''});
+  document.getElementById('msgPreviewWA').textContent=msg;
+  document.getElementById('msgCentroPreview').style.display='block';
+  APP._currentMsg=msg;APP._currentTel=tel;APP._currentEmail=email;
+}
+function openWAMsg(){const tel=document.getElementById('msg_tel').value;if(!tel){showToast('Sin teléfono','error');return;}window.open(`https://wa.me/${tel.replace(/\D/g,'')}?text=${encodeURIComponent(APP._currentMsg)}`,'_blank');}
+function openHordeMsg(){openHordeEmail(document.getElementById('msg_email').value,APP._currentMsg);}
+function openMoodleMsg(){openMoodleMensaje();}
+function copyMsgWA(){navigator.clipboard.writeText(document.getElementById('msgPreviewWA').textContent);showToast('Mensaje copiado ✓','success');}
+
+function msgTab(tab,el){
+  document.querySelectorAll('#view-mensajes .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('msgTabIndividual').style.display=tab==='individual'?'block':'none';
+  document.getElementById('msgTabMasivo').style.display=tab==='masivo'?'block':'none';
+}
+function renderMasivoTable(){
+  const q=(document.getElementById('masivo_search')?.value||'').toLowerCase();
+  const filtered=APP.asignaciones.filter(a=>!q||(a.docente||'').toLowerCase().includes(q));
+  document.getElementById('masivoBody').innerHTML=filtered.map((a,i)=>`<tr>
+    <td><input type="checkbox" class="masivo-chk" data-i="${i}" onchange="updateMasivoCount()"/></td>
+    <td>${a.docente||'—'}</td><td>${a.materia||'—'}</td>
+    <td>C${a.canal}·S${a.sala}</td>
+    <td>${a.telefono||'<span style="color:#aaa">—</span>'}</td>
+    <td>${a.email||'<span style="color:#aaa">—</span>'}</td>
+    <td><div style="display:flex;gap:4px">
+      ${a.telefono?`<button class="btn btn-wa btn-sm" onclick="notifWARow('${a.id}')">WA</button>`:''}
+      ${a.email?`<button class="btn btn-horde btn-sm" onclick="notifHordeRow('${a.id}')">📧</button>`:''}
+    </div></td>
+  </tr>`).join('');
+  window._masivoFiltered=filtered;
+}
+function selectAllMasivo(){document.querySelectorAll('.masivo-chk').forEach(c=>c.checked=true);updateMasivoCount();}
+function toggleAll(chk){document.querySelectorAll('.masivo-chk').forEach(c=>c.checked=chk.checked);updateMasivoCount();}
+function updateMasivoCount(){document.getElementById('masivoCount').textContent=document.querySelectorAll('.masivo-chk:checked').length+' seleccionados';}
+function sendMasivoWA(){
+  const sel=[...document.querySelectorAll('.masivo-chk:checked')].map(c=>(window._masivoFiltered||APP.asignaciones)[parseInt(c.dataset.i)]).filter(a=>a?.telefono);
+  if(!sel.length){showToast('Seleccioná docentes con teléfono','warning');return;}
+  sel.forEach((a,i)=>setTimeout(()=>window.open(buildWALink(a),'_blank'),i*700));
+  showToast(`Abriendo ${sel.length} conversaciones WhatsApp…`,'success');
+}
+function sendMasivoHorde(){
+  const sel=[...document.querySelectorAll('.masivo-chk:checked')].map(c=>(window._masivoFiltered||APP.asignaciones)[parseInt(c.dataset.i)]).filter(a=>a?.email);
+  if(!sel.length){showToast('Seleccioná docentes con email','warning');return;}
+  sel.forEach((a,i)=>setTimeout(()=>openHordeWithAsig(a),i*800));
+  showToast(`Abriendo ${sel.length} borradores en Horde…`,'success');
+}
+
+// ── FORM SUBMIT ──
+async function submitForm(e){
+  e.preventDefault();
+  const btn=document.getElementById('formSubmitBtn');btn.textContent='Guardando…';btn.disabled=true;
+  const docente=document.getElementById('f_docente').value;
+  const cn=document.getElementById('f_canal').value;const s=document.getElementById('f_sala').value;
+  const info=CANALES_BASE.find(c=>String(c.canal_num)===cn&&String(c.sala_num)===s);
+  const isEdit=!!document.getElementById('editId').value;
+  const id=document.getElementById('editId').value||('ASG_'+Date.now());
+  const data={id,docente,
+    materia:document.getElementById('f_materia').value,
+    carrera:document.getElementById('f_carrera').value,
+    cohorte:document.getElementById('f_cohorte').value,
+    comision:document.getElementById('f_comision').value,
+    canal:cn,sala:s,horario:SALA_LABELS[s]||'',
+    fecha_inicio:document.getElementById('f_fecha_inicio').value,
+    fecha_fin:document.getElementById('f_fecha_fin').value,
+    telefono:document.getElementById('f_telefono').value,
+    email:document.getElementById('f_email').value,
+    estado:document.getElementById('f_estado').value,
+    observaciones:document.getElementById('f_obs').value,
+    enlace_zoom:info?.enlace_zoom||'',usuario:info?.usuario||'',contrasena:info?.contrasena||'',
+    fecha_creacion:isEdit?undefined:new Date().toISOString()};
+  if(isEdit){APP.asignaciones[APP.asignaciones.findIndex(a=>a.id===id)]={...APP.asignaciones.find(a=>a.id===id),...data};await apiPost('update','asignaciones',data,id);}
+  else{APP.asignaciones.push(data);await apiPost('create','asignaciones',data);}
+  saveLocal();renderAll();
+  btn.textContent='💾 Guardar asignación';btn.disabled=false;
+  showToast(isEdit?'Asignación actualizada ✓':'Asignación guardada ✓','success');
+  APP.editMode=false;resetForm();
+  showView('docentes',document.querySelectorAll('.nav-item')[3]);
+}
+function resetForm(){
+  document.getElementById('asigForm').reset();
+  document.getElementById('editId').value='';
+  document.getElementById('formTitle').textContent='Nueva asignación';
+  ['linkPreviewGroup','msgPreviewGroup','notifBlock'].forEach(id=>document.getElementById(id).style.display='none');
+  APP.editMode=false;
+}
+function editAsig(id){
+  const a=APP.asignaciones.find(x=>x.id===id);if(!a)return;
+  APP.editMode=true;showView('nuevo',null);
+  setTimeout(()=>{
+    document.getElementById('formTitle').textContent='Editar asignación';
+    document.getElementById('editId').value=id;
+    document.getElementById('f_docente').value=a.docente||'';
+    if(a.docente){
+      document.getElementById('f_telefono').value=a.telefono||'';
+      document.getElementById('f_email').value=a.email||'';
+    }
+    document.getElementById('f_materia').value=a.materia||'';
+    document.getElementById('f_carrera').value=a.carrera||'LGE';
+    document.getElementById('f_cohorte').value=a.cohorte||'2026';
+    document.getElementById('f_comision').value=a.comision||'';
+    document.getElementById('f_canal').value=a.canal||'';
+    onCanalChange();
+    document.getElementById('f_sala').value=a.sala||'';
+    document.getElementById('f_fecha_inicio').value=a.fecha_inicio||'';
+    document.getElementById('f_fecha_fin').value=a.fecha_fin||'';
+    document.getElementById('f_estado').value=a.estado||'activo';
+    document.getElementById('f_obs').value=a.observaciones||'';
+    updateLinkPreview();updateMsgPreview();
+  },120);
+}
+function confirmDel(id,tipo){
+  document.getElementById('delMsg').textContent=tipo==='docente'?'¿Eliminar este docente de la BD? Sus asignaciones no se borran.':'¿Eliminar esta asignación?';
+  document.getElementById('modalDel').classList.add('open');
+  document.getElementById('confirmDelBtn').onclick=()=>tipo==='docente'?deleteDocente(id):deleteAsig(id);
+}
+async function deleteAsig(id){APP.asignaciones=APP.asignaciones.filter(a=>a.id!==id);saveLocal();renderAll();await apiPost('delete','asignaciones',{},id);closeModal('modalDel');showToast('Asignación eliminada','warning');}
+async function deleteDocente(id){APP.docentes=APP.docentes.filter(d=>d.id!==id);saveLocal();renderAll();await apiPost('delete','docentes',{},id);closeModal('modalDel');showToast('Docente eliminado','warning');}
+
+// ── CONFIG ──
+function saveConfig(){
+  const url=document.getElementById('configUrl').value.trim();
+  if(url && !url.startsWith('https://script.google.com')){
+    showToast('La URL debe comenzar con https://script.google.com/…','error');return;
+  }
+  APP.scriptUrl=url;
+  localStorage.setItem('eie_script_url',url);
+  document.getElementById('urlSetupBanner').style.display='none';
+  if(url){showToast('URL guardada. Probando conexión…','success');syncData();}
+  else showToast('URL eliminada. La app funciona solo en modo local.','warning');
+}
+function saveUrlFromBanner(){document.getElementById('configUrl').value=document.getElementById('quickUrlInput').value;saveConfig();}
+
+// ── CSV ──
+function importCSV(e){
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onerror=()=>showToast('Error al leer el archivo','error');
+  reader.onload=ev=>{
+    try{
+      let text=ev.target.result;
+      // Quitar BOM (Excel UTF-8)
+      text=text.replace(/^\uFEFF/,'');
+      // Normalizar saltos de línea
+      text=text.replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+
+      const allLines=text.split('\n');
+      const lines=allLines.filter(l=>l.trim()&&l.trim()!=='');
+      if(lines.length<2){
+        showToast('CSV vacío o sin datos. Asegurate de tener encabezado + al menos una fila.','error');
+        return;
+      }
+
+      // ── Detectar separador: buscar en la primera línea ──
+      const header=lines[0];
+      let sep=',';
+      const cntSemi=(header.match(/;/g)||[]).length;
+      const cntComa=(header.match(/,/g)||[]).length;
+      const cntTab=(header.match(/\t/g)||[]).length;
+      if(cntSemi>=cntComa && cntSemi>=cntTab) sep=';';
+      else if(cntTab>=cntComa && cntTab>=cntSemi) sep='\t';
+      else sep=',';
+
+      // ── Parser de campo que maneja comillas ──
+      function splitLine(line){
+        const res=[]; let cur=''; let inQ=false;
+        for(let i=0;i<line.length;i++){
+          const c=line[i];
+          if(c==='"'){ inQ=!inQ; continue; }
+          if(c===sep && !inQ){ res.push(cur.trim()); cur=''; continue; }
+          cur+=c;
+        }
+        res.push(cur.trim());
+        return res;
+      }
+
+      // ── Parsear encabezados ──
+      const rawHeaders=splitLine(header);
+      const headers=rawHeaders.map(h=>
+        h.toLowerCase()
+         .normalize('NFD').replace(/[\u0300-\u036f]/g,'') // quitar tildes
+         .replace(/[^a-z0-9]/g,'')  // solo letras y números
+         .trim()
+      );
+
+      // Debug: mostrar lo que encontró
+      console.log('Separador detectado:', JSON.stringify(sep));
+      console.log('Headers originales:', rawHeaders);
+      console.log('Headers normalizados:', headers);
+
+      // ── Mapear columnas flexiblemente ──
+      function findCol(...names){ return headers.findIndex(h=>names.some(n=>h===n||h.includes(n))); }
+      const iApel  = findCol('apellido','lastname','apel');
+      const iNomb  = findCol('nombre','name','nomb');
+      const iTel   = findCol('telefono','tel','celular','phone','whatsapp','cel');
+      const iEmail = findCol('email','mail','correo');
+
+      if(iApel<0 && iNomb<0){
+        showToast(
+          `No se encontraron columnas "apellido" o "nombre".\n`+
+          `Encabezados detectados (sep="${sep}"): ${rawHeaders.join(' | ')}`,
+          'error'
+        );
+        return;
+      }
+
+      // ── Parsear filas ──
+      const docs=[];
+      for(let i=1;i<lines.length;i++){
+        const vals=splitLine(lines[i]);
+        if(vals.every(v=>!v.trim())) continue; // fila vacía
+        const apellido = iApel>=0  ? (vals[iApel]||'').trim()  : '';
+        const nombre   = iNomb>=0  ? (vals[iNomb]||'').trim()  : '';
+        if(!apellido && !nombre) continue;
+        let tel   = iTel>=0   ? (vals[iTel]||'').trim()   : '';
+        let email = iEmail>=0 ? (vals[iEmail]||'').trim() : '';
+        // Limpiar teléfono
+        tel=tel.replace(/[\s\-().+]/g,'');
+        docs.push({id:'DOC_'+Date.now()+'_'+i, apellido, nombre, telefono:tel, email, activo:'SI'});
+      }
+
+      if(docs.length===0){
+        showToast(
+          `Se leyeron los encabezados pero no hay filas con datos.\n`+
+          `Separador: "${sep}" · Columnas: ${rawHeaders.join(' | ')}`,
+          'error'
+        );
+        return;
+      }
+
+      // ── Guardar evitando duplicados ──
+      let nuevos=0, duplicados=0;
+      docs.forEach(d=>{
+        const existe=APP.docentes.find(x=>
+          (x.apellido||'').toLowerCase().trim()===(d.apellido||'').toLowerCase().trim()&&
+          (x.nombre||'').toLowerCase().trim()===(d.nombre||'').toLowerCase().trim()
+        );
+        if(!existe){ APP.docentes.push(d); nuevos++; }
+        else duplicados++;
+      });
+      saveLocal(); renderAll();
+      showToast(
+        `✓ ${nuevos} docentes importados${duplicados?' ('+duplicados+' duplicados omitidos)':''}`+
+        ` · sep:"${sep}" · ${docs.length} filas`,
+        'success'
+      );
+
+      // Sync al Sheet si hay URL
+      if(APP.scriptUrl && nuevos>0){
+        docs.filter(d=>!APP.docentes.find(x=>x.id!==d.id&&x.apellido===d.apellido&&x.nombre===d.nombre))
+          .forEach(d=>apiPost('create','docentes',d));
+      }
+
+    }catch(err){
+      console.error('Error importCSV:',err);
+      showToast('Error al procesar el CSV: '+err.message,'error');
+    }
+  };
+  reader.readAsText(file,'UTF-8');
+  e.target.value='';
+}
+
+function exportCSV(){
+  const h=['id','docente','materia','carrera','cohorte','comision','canal','sala','horario','fecha_inicio','fecha_fin','telefono','email','estado'];
+  const rows=APP.asignaciones.map(a=>h.map(k=>`"${(a[k]||'').toString().replace(/"/g,'""')}"`).join(','));
+  dl([h.join(','),...rows].join('\n'),'asignaciones_eie_'+hoy()+'.csv','text/csv');
+}
+function exportDocentesCSV(){
+  const h=['id','apellido','nombre','telefono','email','activo'];
+  const rows=APP.docentes.map(d=>h.map(k=>`"${(d[k]||'').replace(/"/g,'""')}"`).join(','));
+  dl([h.join(','),...rows].join('\n'),'docentes_eie_'+hoy()+'.csv','text/csv');
+}
+function dl(content,name,type){const a=document.createElement('a');a.href='data:'+type+';charset=utf-8,\uFEFF'+encodeURIComponent(content);a.download=name;a.click();}
+function clearLocal(){if(!confirm('¿Eliminar todos los datos locales?'))return;localStorage.removeItem('eie_asignaciones');localStorage.removeItem('eie_docentes');APP.asignaciones=[];APP.docentes=[];renderAll();showToast('Datos locales eliminados','warning');}
+
+// ── HELPERS ──
+function getLinkForAsig(a){return CANALES_BASE.find(c=>String(c.canal_num)===String(a.canal)&&String(c.sala_num)===String(a.sala))?.enlace_zoom||a.enlace_zoom||'';}
+function fmtDate(d){if(!d)return'';if(d.includes('/')&&!d.includes('-'))return d;try{return new Date(d).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});}catch(e){return d;}}
+function fmt(d){return d?fmtDate(d):'—';}
+function hoy(){return new Date().toISOString().slice(0,10);}
+let _tt;
+function showToast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+(type||'')+' show';clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),3200);}
+</script>
+</body>
+</html>
